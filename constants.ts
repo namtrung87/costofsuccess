@@ -884,4 +884,4 @@ export const HANDBOOK_DATA: Record<Language, HandbookEntry[]> = {
   ]
 };
 
-export const DISCORD_LINK = "https://discord.gg/gameifai"; // Update this with your exact invite link if different
+export const DISCORD_LINK = "https://discord.gg/cfQAhSk8";
