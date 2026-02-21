@@ -1,0 +1,84 @@
+/* Main CSS with Custom Neon Animations */
+
+:root {
+  --neon-cyan: #00F0FF;
+  --neon-pink: #FF0055;
+  --neon-green: #39FF14;
+  --neon-blue: #0070FF;
+}
+
+@layer base {
+  body {
+    @apply bg-obsidian text-white overflow-hidden;
+  }
+}
+
+/* Glitch Effect */
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+.animate-glitch {
+  animation: glitch 0.2s ease-in-out infinite;
+}
+
+/* Data Float Effects */
+@keyframes float-data {
+  0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-20vh) translateX(20px); opacity: 0; }
+}
+
+.animate-float-data { animation: float-data 8s linear infinite; }
+.animate-float-data-slow { animation: float-data 12s linear infinite; animation-delay: 2s; }
+.animate-float-data-fast { animation: float-data 5s linear infinite; animation-delay: 1s; }
+
+/* Rain Fall Effect */
+@keyframes rain-fall {
+  0% { transform: translateY(-100%) skewX(-15deg); }
+  100% { transform: translateY(1000%) skewX(-15deg); }
+}
+
+.animate-rain-fall { animation: rain-fall 0.8s linear infinite; }
+.animate-rain-fall-delayed { animation: rain-fall 1.2s linear infinite; animation-delay: 0.3s; }
+.animate-rain-fall-fast { animation: rain-fall 0.5s linear infinite; }
+
+/* Drift Effect (Dust) */
+@keyframes drift {
+  0% { transform: translate(0, 0); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translate(100px, -50px); opacity: 0; }
+}
+
+.animate-drift { animation: drift 10s ease-in-out infinite; }
+.animate-drift-slow { animation: drift 15s ease-in-out infinite; animation-delay: 2s; }
+.animate-drift-fast { animation: drift 5s ease-in-out infinite; animation-delay: 1s; }
+
+/* Background Scanlines */
+.scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanlines::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Glass UI Polish */
+.glass-panel {
+  background: rgba(15, 15, 18, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}

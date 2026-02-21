@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>COST_OF_SUCCESS // GLITCH</title>
+    <!-- Preload Critical LCP Asset -->
+    <link rel="preload" as="image" href="https://i.ibb.co/B2jVsFfK/neon-drop-asset-cfo-office-night.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Fira+Code:wght@300;400;500;700&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              obsidian: '#0F0F12', // Deep Charcoal/Black
+              neonGreen: '#39FF14', // Acid Green (Profit)
+              neonPink: '#FF0055', // Glitch Magenta (Loss)
+              neonCyan: '#00F0FF', // Cyan (Tech)
+              glass: 'rgba(255, 255, 255, 0.1)',
+            },
+            fontFamily: {
+              heading: ['"Exo 2"', 'sans-serif'],
+              body: ['Montserrat', 'sans-serif'],
+              mono: ['Fira Code', 'monospace'],
+            },
+            boxShadow: {
+              'neon-green': '0 0 10px #39FF14, 0 0 20px #39FF14',
+              'neon-pink': '0 0 10px #FF0055, 0 0 20px #FF0055',
+              'neon-cyan': '0 0 10px #00F0FF, 0 0 20px #00F0FF',
+            },
+            keyframes: {
+              breathe: {
+                '0%, 100%': { transform: 'scale(1)' },
+                '50%': { transform: 'scale(1.02)' },
+              },
+              scan: {
+                '0%': { backgroundPosition: '0% 0%' },
+                '100%': { backgroundPosition: '0% 100%' },
+              },
+              // Gen Z "Juice" Effects
+              shake: {
+                '0%, 100%': { transform: 'translateX(0)' },
+                '25%': { transform: 'translateX(-5px)' },
+                '75%': { transform: 'translateX(5px)' },
+              },
+              pop: {
+                '0%': { transform: 'scale(0.8)', opacity: '0' },
+                '50%': { transform: 'scale(1.1)' },
+                '100%': { transform: 'scale(1)', opacity: '1' },
+              }
+            },
+            animation: {
+              breathe: 'breathe 4s ease-in-out infinite',
+              scan: 'scan 2s linear infinite',
+              shake: 'shake 0.3s ease-in-out',
+              pop: 'pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #0F0F12;
+        color: white;
+        overflow: hidden; /* Prevent scrolling, app is fixed viewport */
+        -webkit-font-smoothing: antialiased;
+      }
+      /* Custom Scrollbar for inner elements */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0F0F12; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #333; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #00F0FF; 
+      }
+      
+      /* Tooltip Styles */
+      .tooltip-trigger {
+        border-bottom: 1px dashed #00F0FF;
+        cursor: help;
+        position: relative;
+        color: #00F0FF;
+        font-weight: 600;
+      }
+      
+      /* Mobile tap highlight remove */
+      * {
+        -webkit-tap-highlight-color: transparent;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
