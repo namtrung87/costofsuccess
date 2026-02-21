@@ -883,3 +883,5 @@ export const HANDBOOK_DATA: Record<Language, HandbookEntry[]> = {
     }
   ]
 };
+
+export const DISCORD_LINK = "https://discord.gg/namtrung87";

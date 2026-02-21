@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { useAudio } from '../context/AudioContext';
 import { GamePhase } from '../types';
-import { ASSETS } from '../constants';
+import { ASSETS, DISCORD_LINK } from '../constants';
 import CyberButton from '../components/UI/CyberButton';
 
 const VictoryScreen: React.FC = () => {
@@ -70,13 +70,22 @@ const VictoryScreen: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="flex justify-center pt-8">
+                <div className="flex flex-col gap-4 items-center justify-center pt-8 w-full max-w-sm mx-auto">
                     <CyberButton
                         label={t.btn}
                         variant="PRIMARY"
                         onClick={handleRestart}
-                        className="px-12 py-6 text-xl shadow-neon-cyan"
+                        className="px-12 py-6 text-xl shadow-neon-cyan w-full"
                     />
+
+                    <button
+                        onClick={() => window.open(DISCORD_LINK, '_blank')}
+                        className="w-full py-4 bg-[#5865F2]/20 border border-[#5865F2] text-[#5865F2] font-heading font-bold tracking-widest uppercase hover:bg-[#5865F2] hover:text-white transition-all duration-200 skew-x-[-10deg] shadow-[0_0_15px_rgba(88,101,242,0.3)] mt-2 hover:scale-105 active:scale-95"
+                    >
+                        <span className="inline-block skew-x-[10deg]">
+                            {state.language === 'EN' ? 'BRAG ON DISCORD' : 'KHOE CHIẾN TÍCH TRÊN DISCORD'}
+                        </span>
+                    </button>
                 </div>
             </div>
 

@@ -3,6 +3,7 @@ import { useGame } from '../context/GameContext';
 import { useAudio } from '../context/AudioContext';
 import { GamePhase } from '../types';
 import CyberButton from '../components/UI/CyberButton';
+import { DISCORD_LINK } from '../constants';
 
 const GameOver: React.FC = () => {
     const { state, dispatch } = useGame();
@@ -40,13 +41,21 @@ const GameOver: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="flex justify-center">
+                <div className="flex flex-col gap-4 items-center justify-center w-full max-w-sm mx-auto">
                     <CyberButton
                         label={t.btn}
                         variant="DANGER"
                         onClick={handleRetry}
-                        className="px-10 py-5 shadow-neon-pink"
+                        className="px-10 py-5 shadow-neon-pink w-full"
                     />
+                    <button
+                        onClick={() => window.open(DISCORD_LINK, '_blank')}
+                        className="w-full py-4 bg-[#5865F2]/20 border border-[#5865F2] text-white font-heading font-bold tracking-widest uppercase hover:bg-[#5865F2] hover:text-white transition-all duration-200 skew-x-[-10deg] shadow-[0_0_15px_rgba(88,101,242,0.4)] mt-2 hover:scale-105 active:scale-95"
+                    >
+                        <span className="inline-block skew-x-[10deg]">
+                            {state.language === 'EN' ? 'ASK FOR HELP ON DISCORD' : 'TÌM SỰ TRỢ GIÚP TRÊN DISCORD'}
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
