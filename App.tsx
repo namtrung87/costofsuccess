@@ -12,6 +12,7 @@ import FeedbackModal from './components/UI/FeedbackModal';
 import PhaseTransition from './components/UI/PhaseTransition';
 import LoadingScreen from './components/UI/LoadingScreen';
 import CyberOverlay from './components/UI/CyberOverlay';
+import PhaseSkeleton from './components/UI/PhaseSkeleton';
 import WardrobeModal from './components/UI/WardrobeModal';
 import ShareModal from './components/UI/ShareModal';
 import CostDashboard from './components/UI/CostDashboard';
@@ -77,7 +78,7 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundary extends React.Component<React.PropsWithChildren<ErrorBoundaryProps>, ErrorBoundaryState> {
   state: ErrorBoundaryState = { hasError: false, error: null };
 
   static getDerivedStateFromError(error: Error) {
@@ -257,7 +258,7 @@ const GameContent: React.FC = () => {
       {/* Main Game Canvas */}
       <div className="relative z-10 w-full h-full">
         {/* Suspense Wrapper with fallback loader */}
-        <Suspense fallback={<LoadingScreen message="NEURAL LINK ESTABLISHING..." />}>
+        <Suspense fallback={<PhaseSkeleton />}>
           <AnimatePresence mode="wait">
             {renderPhase()}
           </AnimatePresence>

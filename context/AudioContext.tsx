@@ -7,6 +7,8 @@ interface AudioContextType {
   initAudio: () => Promise<void>;
   playSFX: (key: string) => void;
   toggleMute: () => void;
+  setVolume: (volume: number) => void;
+  getVolume: () => number;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -143,8 +145,16 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     audioService.playSFX(key);
   };
 
+  const setVolume = (volume: number) => {
+    audioService.setVolume(volume);
+  };
+
+  const getVolume = (): number => {
+    return audioService.getVolume();
+  };
+
   return (
-    <AudioContext.Provider value={{ initAudio, playSFX, toggleMute }}>
+    <AudioContext.Provider value={{ initAudio, playSFX, toggleMute, setVolume, getVolume }}>
       {children}
     </AudioContext.Provider>
   );

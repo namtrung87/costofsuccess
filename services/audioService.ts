@@ -15,6 +15,7 @@ class AudioService {
     private stressLevel: number = 100; // 0-100 (Sanity)
     private stressGain: GainNode | null = null;
     private stressFilter: BiquadFilterNode | null = null;
+    private masterVolume = 0.35; // Default non-muted volume (0.0 - 1.0)
 
     // Active nodes
     private musicNodes: AudioScheduledSourceNode[] = [];
@@ -260,8 +261,21 @@ class AudioService {
         if (!this.masterGain || !this.audioContext) return false;
         this.isMuted = !this.isMuted;
         const now = this.audioContext.currentTime;
-        this.masterGain.gain.setTargetAtTime(this.isMuted ? 0 : 0.35, now, 0.2);
+        this.masterGain.gain.setTargetAtTime(this.isMuted ? 0 : this.masterVolume, now, 0.2);
         return this.isMuted;
+    }
+
+    setVolume(volume: number) {
+        // volume: 0.0 - 1.0
+        this.masterVolume = Math.max(0, Math.min(1, volume)) * 0.7; // scale to max comfortable 0.7
+        if (!this.masterGain || !this.audioContext || this.isMuted) return;
+        const now = this.audioContext.currentTime;
+        this.masterGain.gain.setTargetAtTime(this.masterVolume, now, 0.1);
+    }
+
+    getVolume(): number {
+        // Returns a 0-1 value for UI display
+        return Math.round((this.masterVolume / 0.7) * 100) / 100;
     }
 
     playSFX(key: 'HOVER' | 'CLICK' | 'SUCCESS' | 'ERROR' | 'SWIPE' | 'VALVE' | 'LAUNCH' | 'PICKUP' | 'DROP' | 'TYPE') {
