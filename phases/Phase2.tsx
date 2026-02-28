@@ -23,7 +23,7 @@ const Phase2: React.FC = () => {
     'PHASE_COMPLETE'
   ];
 
-  const isAssetsLoading = useAssetPreloader();
+  const { isLoaded } = useAssetPreloader();
 
   const [subPhase, setSubPhase] = useState<'DIALOGUE' | 'TUTORIAL' | 'GAME' | 'RESULT'>('DIALOGUE');
   const [currentNodeId, setCurrentNodeId] = useState<string>('start');
@@ -95,7 +95,7 @@ const Phase2: React.FC = () => {
     : currentNode.characterImage;
 
   return (
-    <div className={`w-full h-full relative transition-opacity duration-1000 ${isAssetsLoading ? 'opacity-0' : 'opacity-1'}`}>
+    <div className={`w-full h-full relative transition-opacity duration-1000 ${!isLoaded ? 'opacity-0' : 'opacity-1'}`}>
       <BackgroundParallax
         image={bgImage}
         intensity={0.03}

@@ -28,7 +28,7 @@ const Phase1: React.FC = () => {
     'CHAR_JULES_HAPPY'
   ];
 
-  const isAssetsLoading = useAssetPreloader();
+  const { isLoaded } = useAssetPreloader();
 
   const [subPhase, setSubPhase] = useState<'DIALOGUE' | 'QUIZ' | 'CONTRACT' | 'RESULT'>('DIALOGUE');
   const [currentNodeId, setCurrentNodeId] = useState<string>('start');
@@ -121,7 +121,7 @@ const Phase1: React.FC = () => {
     : (currentNode.characterImage || 'PLAYER_AVATAR'); // Default fallback
 
   return (
-    <div className={`w-full h-full relative scanlines transition-opacity duration-1000 ${isAssetsLoading ? 'opacity-0' : 'opacity-1'}`}>
+    <div className={`w-full h-full relative scanlines transition-opacity duration-1000 ${!isLoaded ? 'opacity-0' : 'opacity-1'}`}>
       <BackgroundParallax
         image={bgImage}
         intensity={0.03}
