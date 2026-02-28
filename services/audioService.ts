@@ -35,6 +35,12 @@ class AudioService {
         const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
         this.audioContext = new AudioContextClass();
 
+        // Initialize Stress/Sanity Filter
+        this.stressFilter = this.audioContext.createBiquadFilter();
+        this.stressFilter.type = 'lowpass';
+        this.stressFilter.frequency.value = 20000;
+        this.stressFilter.Q.value = 1;
+
         // MASTER CHAIN
         this.masterGain = this.audioContext.createGain();
         this.masterGain.gain.value = 0.35;
@@ -50,10 +56,11 @@ class AudioService {
         compressor.ratio.value = 12;
         compressor.attack.value = 0.003;
         compressor.release.value = 0.25;
-        compressor.connect(this.audioContext.destination);
 
+        // Signal Flow: Master -> Stress Filter -> Compressor -> Destination
         this.masterGain.connect(this.stressFilter);
         this.stressFilter.connect(compressor);
+        compressor.connect(this.audioContext.destination);
 
         this.isInitialized = true;
 

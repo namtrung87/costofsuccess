@@ -132,9 +132,13 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [state.sanity]);
 
   const initAudio = async () => {
-    await audioService.initialize();
-    audioService.startMusic();
-    audioService.setStressLevel(state.sanity);
+    try {
+      await audioService.initialize();
+      audioService.startMusic();
+      audioService.setStressLevel(state.sanity);
+    } catch (error) {
+      console.error('Audio initialization failed, proceeding without sound:', error);
+    }
   };
 
   const toggleMute = () => {
