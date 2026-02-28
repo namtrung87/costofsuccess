@@ -6,14 +6,24 @@ import DialogueBox from '../components/VisualNovel/DialogueBox';
 import ApportionmentMathGame from '../components/Gameplay/ApportionmentMathGame';
 import { PHASE6_DIALOGUE, MATH_PROBLEMS } from '../data/phase6';
 import { ASSETS } from '../constants';
+import BackgroundParallax from '../components/UI/BackgroundParallax';
+import { useAssetPreloader } from '../hooks/useAssetPreloader';
 
 const Phase6: React.FC = () => {
   const { state, dispatch } = useGame();
   const lang = state.language;
+
+  // Asset Keys for Preloader
+  const assetKeys = [
+    'BG_MAINFRAME'
+  ];
+
+  const isAssetsLoading = useAssetPreloader(assetKeys);
+
   const [subPhase, setSubPhase] = useState<'DIALOGUE' | 'GAME'>('DIALOGUE');
   const [currentNodeId, setCurrentNodeId] = useState<string>('start');
   const [currentNode, setCurrentNode] = useState<DialogueNode>(PHASE6_DIALOGUE[lang]['start']);
-  
+
   const [bgImage, setBgImage] = useState(state.assets[PHASE6_DIALOGUE[lang]['start'].backgroundImage!] || ASSETS.BG_OPS_CENTER);
 
   useEffect(() => {
@@ -23,10 +33,10 @@ const Phase6: React.FC = () => {
   }, [currentNodeId, lang]);
 
   useEffect(() => {
-      const key = currentNode.backgroundImage;
-      if (key && state.assets[key]) {
-          setBgImage(state.assets[key]);
-      }
+    const key = currentNode.backgroundImage;
+    if (key && state.assets[key]) {
+      setBgImage(state.assets[key]);
+    }
   }, [currentNode, state.assets]);
 
   const handleChoice = (nextId: string, action?: (dispatch: any) => void) => {
@@ -37,11 +47,14 @@ const Phase6: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full relative">
-      <div className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out" style={{ backgroundImage: `url(${bgImage})`, filter: 'brightness(0.5)' }} />
-      
+    <div className={`w-full h-full relative transition-opacity duration-1000 ${isAssetsLoading ? 'opacity-0' : 'opacity-1'}`}>
+      <BackgroundParallax
+        image={bgImage}
+        intensity={0.03}
+      />
+
       {subPhase === 'DIALOGUE' && (
-        <DialogueBox 
+        <DialogueBox
           speaker={currentNode.speaker}
           speakerTitle={currentNode.speakerTitle}
           text={currentNode.text}
@@ -51,14 +64,14 @@ const Phase6: React.FC = () => {
       )}
 
       {subPhase === 'GAME' && (
-        <ApportionmentMathGame 
-            problems={MATH_PROBLEMS}
-            onCorrect={() => dispatch({ type: 'UPDATE_BUDGET', payload: 10 })}
-            onIncorrect={() => dispatch({ type: 'UPDATE_SANITY', payload: -2 })}
-            onComplete={() => {
-                setSubPhase('DIALOGUE');
-                setCurrentNodeId('post_game');
-            }}
+        <ApportionmentMathGame
+          problems={MATH_PROBLEMS}
+          onCorrect={() => dispatch({ type: 'UPDATE_BUDGET', payload: 10 })}
+          onIncorrect={() => dispatch({ type: 'UPDATE_SANITY', payload: -2 })}
+          onComplete={() => {
+            setSubPhase('DIALOGUE');
+            setCurrentNodeId('post_game');
+          }}
         />
       )}
     </div>

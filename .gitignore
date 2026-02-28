@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Build Logs & AI Artifacts
+build_*.txt
+.claude/
+.gemini/

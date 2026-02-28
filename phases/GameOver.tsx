@@ -42,20 +42,34 @@ const GameOver: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-4 items-center justify-center w-full max-w-sm mx-auto">
-                    <CyberButton
-                        label={t.btn}
-                        variant="DANGER"
-                        onClick={handleRetry}
-                        className="px-10 py-5 shadow-neon-pink w-full"
-                    />
-                    <button
-                        onClick={() => window.open(DISCORD_LINK, '_blank')}
-                        className="w-full py-4 bg-[#5865F2]/20 border border-[#5865F2] text-white font-heading font-bold tracking-widest uppercase hover:bg-[#5865F2] hover:text-white transition-all duration-200 skew-x-[-10deg] shadow-[0_0_15px_rgba(88,101,242,0.4)] mt-2 hover:scale-105 active:scale-95"
-                    >
-                        <span className="inline-block skew-x-[10deg]">
-                            {state.language === 'EN' ? 'ASK FOR HELP ON DISCORD' : 'TÌM SỰ TRỢ GIÚP TRÊN DISCORD'}
-                        </span>
-                    </button>
+                    <div className="flex flex-col gap-3 w-full mt-4">
+                        <CyberButton
+                            label={state.language === 'EN' ? 'RETRY FROM CHECKPOINT' : 'THỬ LẠI TỪ ĐIỂM DỪNG'}
+                            variant="PRIMARY"
+                            onClick={() => dispatch({ type: 'RETRY_PHASE' })}
+                            className="w-full shadow-neon-blue"
+                        />
+
+                        <CyberButton
+                            label={t.btn}
+                            variant="DANGER"
+                            onClick={handleRetry}
+                            className="w-full shadow-neon-pink opacity-70 hover:opacity-100"
+                        />
+
+                        {/* New Thematic CTA */}
+                        <button
+                            onClick={() => window.open(DISCORD_LINK, '_blank')}
+                            className="group relative w-full h-16 bg-black border border-neonCyan text-neonCyan font-mono font-bold tracking-widest uppercase hover:bg-neonCyan hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(0,240,255,0.2)] hover:shadow-[0_0_25px_rgba(0,240,255,0.6)] animate-pulse"
+                        >
+                            <span className="block text-xs opacity-70 mb-1 font-body">
+                                {state.language === 'EN' ? "TIRED OF MANUAL INPUT?" : "MỆT MỎI VÌ NHẬP LIỆU?"}
+                            </span>
+                            <span className="relative z-10 font-heading">
+                                {state.language === 'EN' ? 'LEARN AI AUTOMATION IN DISCORD' : 'HỌC AUTOMATION TẠI DISCORD'}
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

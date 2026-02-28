@@ -4,44 +4,44 @@ import { GamePhase, GameState, Language } from './types';
 // Assets - Localized to public folder
 export const ASSETS = {
   // Backgrounds
-  BG_LOBBY: "/assets/images/bg_lobby.png",
-  BG_DESIGN_LAB: "/assets/images/bg_design_lab.png",
-  BG_TECH_ROOM: "/assets/images/bg_ops_center.png",
-  BG_OPS_CENTER: "/assets/images/bg_ops_center.png",
+  BG_LOBBY: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/bg_lobby_v2_1772162710449.png",
+  BG_DESIGN_LAB: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/bg_design_lab_v3_1772163232223.png",
+  BG_TECH_ROOM: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/bg_deconstruction_v2_1772163257940.png",
+  BG_OPS_CENTER: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/bg_ops_center_v2_1772164400000_1772163872253.png",
+  BG_ALLOCATION_SECTOR: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/bg_allocation_sector_v1_1772164400001_1772163885837.png",
   BG_COMMAND_CENTER: "/assets/images/bg_cfo_office.png",
   BG_PUMP_ROOM: "/assets/images/bg_pump_room.png",
   BG_VALUATION_ROOM: "/assets/images/bg_valuation.png",
+  BG_MAINFRAME: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/bg_mainframe_v1_1772164400003_1772163927218.png",
   BG_DROP_ROOM: "/assets/images/bg_drop_room.png",
   BG_ROOFTOP: "/assets/images/bg_cfo_office.png",
-  BG_OFFICE: "/assets/images/bg_design_lab.png",
+  BG_OFFICE: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/bg_design_lab_v3_1772163232223.png",
 
-  // Characters
-  CHAR_JULES_NEUTRAL: "/assets/images/char_jules.png",
-  CHAR_JULES_SMUG: "/assets/images/char_jules.png",
-  CHAR_JULES_HAPPY: "/assets/images/char_jules.png",
+  // Characters & Aliases
+  CHAR_JULES: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/char_jules_smug_v2_1772162729891.png",
+  CHAR_JULES_NEUTRAL: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/char_jules_smug_v2_1772162729891.png",
+  CHAR_JULES_SMUG: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/char_jules_smug_v2_1772162729891.png",
+  CHAR_JULES_HAPPY: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/char_jules_smug_v2_1772162729891.png",
   CHAR_JULES_ANGRY: "/assets/images/char_jules.png",
   CHAR_JULES_SIP: "/assets/images/char_jules.png",
 
-  CHAR_ROB_NEUTRAL: "/assets/images/char_rob.png",
-  CHAR_ROB_ANGRY: "/assets/images/char_rob.png",
-  CHAR_ROB_SHOCKED: "/assets/images/char_rob.png",
+  CHAR_ROB: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/char_rob_neutral_v2_1772164400002_1772163905389.png",
+  CHAR_ROB_NEUTRAL: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/char_rob_neutral_v2_1772164400002_1772163905389.png",
+  CHAR_ROB_ANGRY: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/char_rob_angry_v2_1772164400004_1772163944130.png",
+  CHAR_ROB_SHOCKED: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/char_rob_angry_v2_1772164400004_1772163944130.png",
 
-  CHAR_KAI_NEUTRAL: "/assets/images/char_kai.png",
-  CHAR_KAI_STRESSED: "/assets/images/char_kai.png",
-  CHAR_KAI_CONFIDENT: "/assets/images/char_kai.png",
+  CHAR_KAI: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/char_kai_confident_v2_1772164400005_1772163960770.png",
+  CHAR_KAI_NEUTRAL: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/char_kai_confident_v2_1772164400005_1772163960770.png",
+  CHAR_KAI_STRESSED: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/char_kai_stressed_v2_1772163273581.png",
+  CHAR_KAI_CONFIDENT: "file:///C:/Users/Trung%20Nguyen/.gemini/antigravity/brain/78b1a61a-8834-4bd6-9e87-aa4680dfce9c/char_kai_confident_v2_1772164400005_1772163960770.png",
 
+  CHAR_KEN: "/assets/images/char_avatar_d.png",
   CHAR_KEN_NEUTRAL: "/assets/images/char_avatar_d.png",
 
   // Extra Avatars
   CHAR_AVATAR_A: "/assets/images/char_avatar_a.png",
   CHAR_AVATAR_B: "/assets/images/char_avatar_b.png",
   CHAR_AVATAR_C: "/assets/images/char_avatar_c.png",
-
-  // Aliases for Data Files
-  CHAR_JULES: "/assets/images/char_jules.png",
-  CHAR_ROB: "/assets/images/char_rob.png",
-  CHAR_KAI: "/assets/images/char_kai.png",
-  CHAR_KEN: "/assets/images/char_avatar_d.png",
 
   // Props / UI Elements
   PROP_GATEKEEPER: "/assets/images/prop_gatekeeper.png",
@@ -69,6 +69,30 @@ export const ASSETS = {
   RANK_CERTIFIED_CONTROLLER: "/assets/images/icon_launch.png",
 };
 
+export const DIFFICULTY_SETTINGS = {
+  ZEN: {
+    startingBudget: 5000,
+    startingSanity: 100,
+    sanityDecayMultiplier: 0.5,
+    penaltyMultiplier: 0.5,
+    rewardMultiplier: 1.2
+  },
+  NORMAL: {
+    startingBudget: 2000,
+    startingSanity: 100,
+    sanityDecayMultiplier: 1.0,
+    penaltyMultiplier: 1.0,
+    rewardMultiplier: 1.0
+  },
+  HARDCORE: {
+    startingBudget: 500,
+    startingSanity: 80,
+    sanityDecayMultiplier: 2.0,
+    penaltyMultiplier: 2.0,
+    rewardMultiplier: 0.8
+  }
+};
+
 // Lazy Load Bundles
 export const ASSET_BUNDLES = {
   BUNDLE_LAB: ['BG_DESIGN_LAB', 'BG_TECH_ROOM', 'CHAR_KAI_NEUTRAL'],
@@ -80,8 +104,8 @@ export const INITIAL_STATE: GameState = {
   language: 'EN', // Default Language
   currentPhase: GamePhase.START_SCREEN,
   lastActivePhase: null,
-  // Unlock ALL phases for free navigation (Dev/Sandbox Mode)
-  unlockedPhases: Object.values(GamePhase),
+  // Unlock ONLY start screen by default (Fixing Dev Mode)
+  unlockedPhases: [GamePhase.START_SCREEN],
   sanity: 100,
   budget: 1000,
   playerName: "Intern",
@@ -97,6 +121,19 @@ export const INITIAL_STATE: GameState = {
     ...ASSETS
   },
   loadedBundles: [],
+  isAssetsLoading: false,
+  percentageLoaded: 0,
+  toasts: [],
+  unlockedAchievements: [],
+  streak: 0,
+  maxStreak: 0,
+  equippedAvatar: 'avatar_default',
+  unlockedCosmetics: ['avatar_default', 'theme_default'],
+  activeTheme: 'theme_default',
+  isWardrobeOpen: false,
+  isShareModalOpen: false,
+  flags: [],
+  difficulty: 'NORMAL' as any // Will be initialized correctly in context
 };
 
 export const SANITY_CRITICAL_THRESHOLD = 25;
@@ -118,7 +155,7 @@ export const PHASE_TITLES: Record<string, Record<Language, string>> = {
   'PHASE_13': { EN: 'LEVEL 13: THE CONTRIBUTION REVELATION', VI: 'MÀN 13: SỐ DƯ ĐẢM PHÍ' },
   'PHASE_14': { EN: 'LEVEL 14: THE DUAL BOOKS', VI: 'MÀN 14: HAI CUỐN SỔ' },
   'PHASE_15': { EN: 'LEVEL 15: THE BREAK-EVEN CANVAS', VI: 'MÀN 15: ĐIỂM HÒA VỐN' },
-  'PHASE_16': { EN: 'FINAL LEVEL: BOSS FIGHT', VI: 'MÀN CUỐI: THE PITCH' },
+  'PHASE_16': { EN: 'LEVEL 16: THE SAFETY NET PITCH', VI: 'MÀN 16: CHIẾN LƯỢC AN TOÀN' },
   'PHASE_17': { EN: 'LEVEL 17: THE MASTER BLUEPRINT', VI: 'MÀN 17: BẢN THIẾT KẾ' },
   'PHASE_18': { EN: 'LEVEL 18: THE MARKET SHOCK', VI: 'MÀN 18: CÚ SỐC THỊ TRƯỜNG' },
   'PHASE_19': { EN: 'LEVEL 19: THE SUPPLY CHAIN CRISIS', VI: 'MÀN 19: KHỦNG HOẢNG CHUỖI CUNG ỨNG' },
@@ -766,6 +803,41 @@ export const HANDBOOK_DATA: Record<Language, HandbookEntry[]> = {
       title: 'Under/Over Absorption',
       definition: 'The difference between the overheads we "guessed" (Absorbed) and what we actually spent.',
       example: 'If Actual Rent > Budgeted Rent, we have Under-Absorbed (Lost money).'
+    },
+    {
+      id: 'marginal_costing',
+      category: 'ADVANCED',
+      title: 'Marginal Costing',
+      definition: 'A decision-making technique that only considers Variable (Marginal) costs. Fixed costs are treated as period costs.',
+      example: 'Used for short-term decisions like "Should we accept this one-off TikTok order?"'
+    },
+    {
+      id: 'contribution',
+      category: 'ADVANCED',
+      title: 'Contribution',
+      definition: 'Sales Price minus Variable Cost. This is what "contributes" toward covering fixed costs and making profit.',
+      example: 'Selling price $100 - Variable cost $60 = $40 Contribution.'
+    },
+    {
+      id: 'break_even',
+      category: 'ADVANCED',
+      title: 'Break-Even Point',
+      definition: 'The level of sales where Total Profit is Zero. Fixed Costs / Contribution per unit.',
+      example: 'Fixed Costs $10,000 / $40 Contribution = 250 units to break even.'
+    },
+    {
+      id: 'standard_cost',
+      category: 'ADVANCED',
+      title: 'Standard Costing',
+      definition: 'A "Budgeted" cost for a single unit, used to measure performance through variance analysis.',
+      example: 'Rob setting a standard of 2m fabric per hoodie.'
+    },
+    {
+      id: 'variance',
+      category: 'ADVANCED',
+      title: 'Variance',
+      definition: 'The difference between the Actual cost and the Standard (Budgeted) cost.',
+      example: 'Actual $50 - Standard $45 = $5 Adverse Variance (Overspent).'
     }
   ],
   VI: [
@@ -809,7 +881,7 @@ export const HANDBOOK_DATA: Record<Language, HandbookEntry[]> = {
       category: 'BASIC',
       title: 'Chi phí Biến đổi',
       definition: 'Chi phí tăng giảm tỷ lệ thuận theo sản lượng.',
-      example: 'Làm nhiều áo thì tốn nhiều khóa kéo hơn.'
+      example: 'Bán 100k - Biến phí 60k = 40k Số dư đảm phí.'
     },
     {
       id: 'cost_object',

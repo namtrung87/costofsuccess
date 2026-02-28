@@ -14,6 +14,7 @@ const StartScreen: React.FC = () => {
     const ui = UI_STRINGS[state.language];
 
     const [showBriefing, setShowBriefing] = useState(false);
+    const [showDifficulty, setShowDifficulty] = useState(false);
     const [showAvatarCreator, setShowAvatarCreator] = useState(false);
 
     const handleStartClick = async () => {
@@ -24,6 +25,12 @@ const StartScreen: React.FC = () => {
 
     const handleBriefingComplete = () => {
         setShowBriefing(false);
+        setShowDifficulty(true);
+    };
+
+    const handleDifficultySelect = (difficulty: any) => {
+        dispatch({ type: 'SET_DIFFICULTY', payload: difficulty });
+        setShowDifficulty(false);
         setShowAvatarCreator(true);
     };
 
@@ -59,8 +66,39 @@ const StartScreen: React.FC = () => {
                 <AvatarCreator onComplete={handleAvatarComplete} />
             )}
 
+            {/* DIFFICULTY SELECT OVERLAY */}
+            {showDifficulty && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/95 p-4 animate-in zoom-in duration-300">
+                    <GlassPanel intensity="HIGH" border="CYAN" className="max-w-xl w-full flex flex-col gap-6">
+                        <div className="border-b border-neonCyan/50 pb-4 text-center">
+                            <h2 className="text-2xl font-heading text-neonCyan tracking-widest uppercase">Select Intensity</h2>
+                        </div>
+
+                        <div className="flex flex-col gap-4">
+                            {[
+                                { id: 'ZEN', label: 'ZEN MODE', desc: 'Chill vibes. High budget, low stress.', color: 'text-neonCyan', border: 'border-neonCyan/30' },
+                                { id: 'NORMAL', label: 'INTERN SCALE', desc: 'Standard market volatility.', color: 'text-white', border: 'border-white/20' },
+                                { id: 'HARDCORE', label: 'CFO NIGHTMARE', desc: 'Low cash, high decay. One mistake = Bankruptcy.', color: 'text-neonPink', border: 'border-neonPink/50' }
+                            ].map((d) => (
+                                <button
+                                    key={d.id}
+                                    onClick={() => handleDifficultySelect(d.id)}
+                                    className={`p-4 border ${d.border} bg-black/40 hover:bg-white/5 transition-all group text-left relative overflow-hidden`}
+                                >
+                                    <h3 className={`font-heading font-black text-xl ${d.color} group-hover:scale-105 transition-transform`}>{d.label}</h3>
+                                    <p className="text-xs text-gray-400 font-mono italic">{d.desc}</p>
+                                    <div className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span className="text-neonCyan animate-pulse">SELECT_PRIORITY_</span>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </GlassPanel>
+                </div>
+            )}
+
             {/* MISSION BRIEFING OVERLAY - Snackable Version */}
-            {showBriefing && !showAvatarCreator && (
+            {showBriefing && !showDifficulty && !showAvatarCreator && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/95 p-4 animate-in zoom-in duration-300">
                     <GlassPanel intensity="HIGH" border="CYAN" className="max-w-3xl w-full flex flex-col gap-6 relative overflow-hidden">
 
@@ -219,16 +257,26 @@ const StartScreen: React.FC = () => {
                             <button
                                 onClick={() => window.open(DISCORD_LINK, '_blank')}
                                 onMouseEnter={() => playSFX('HOVER')}
-                                className="group relative w-full h-12 bg-[#5865F2]/20 border border-[#5865F2] text-[#5865F2] font-heading font-bold text-lg tracking-widest uppercase hover:bg-[#5865F2] hover:text-white hover:scale-105 active:scale-95 transition-all duration-200 skew-x-[-10deg] mt-4 shadow-[0_0_15px_rgba(88,101,242,0.3)]"
+                                className="group relative w-full h-12 bg-[#5865F2]/20 border border-[#5865F2] text-[#5865F2] font-heading font-bold text-lg tracking-widest uppercase hover:bg-[#5865F2] hover:text-white hover:scale-105 active:scale-95 transition-all duration-200 mt-4 shadow-[0_0_15px_rgba(88,101,242,0.3)] skew-x-[-10deg]"
                             >
                                 <span className="relative z-10 flex items-center justify-center gap-2 skew-x-[10deg]">
-                                    {state.language === 'EN' ? '🤖 JOIN DISCORD COMMUNITY' : '🤖 THAM GIA DISCORD CỘNG ĐỒNG'}
+                                    {state.language === 'EN' ? '👾 SURVIVOR GUILD (DISCORD)' : '👾 HỘI QUÁN SINH TỒN (DISCORD)'}
                                 </span>
                             </button>
                         </div>
 
+                        {/* Developer Mode Teaser (Tech Insight CTA) */}
+                        <div
+                            className="mt-6 text-xs font-mono text-neonPink/80 tracking-widest cursor-pointer hover:text-neonPink hover:animate-pulse transition-all bg-black/50 border border-transparent hover:border-neonPink/50 px-6 py-3"
+                            onClick={() => window.open(DISCORD_LINK, '_blank')}
+                        >
+                            {state.language === 'EN'
+                                ? "[ ROOT ] -> GET AI AUTOMATION CODES IN DISCORD"
+                                : "[ SYSTEM ] -> MỞ KHÓA CODE AI TẠI DISCORD GUILD"}
+                        </div>
+
                         {/* Footer */}
-                        <div className="mt-12 text-xs font-mono text-gray-600 tracking-widest">
+                        <div className="mt-8 text-xs font-mono text-gray-600 tracking-widest">
                             ASSETS LOADED // SYSTEM READY TO LAUNCH
                         </div>
                     </div>

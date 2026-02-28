@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Main CSS with Custom Neon Animations */
 
 :root {
@@ -5,22 +9,75 @@
   --neon-pink: #FF0055;
   --neon-green: #39FF14;
   --neon-blue: #0070FF;
+  --bg-color: #0F0F12;
+}
+
+.theme-retro {
+  --neon-cyan: #FF00FF;
+  /* Hot Pink */
+  --neon-pink: #00FFFF;
+  /* Electric Blue */
+  --neon-green: #FFFF00;
+  /* Laser Yellow */
+  --bg-color: #1a0b2e;
+}
+
+.theme-retro::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(transparent 50%, rgba(255, 0, 255, 0.05) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.theme-minimal {
+  --neon-cyan: #FFFFFF;
+  --neon-pink: #333333;
+  --neon-green: #666666;
+  --bg-color: #000000;
+  filter: grayscale(1);
+}
+
+.theme-minimal * {
+  border-radius: 0 !important;
+  text-transform: uppercase;
 }
 
 @layer base {
   body {
-    @apply bg-obsidian text-white overflow-hidden;
+    background-color: var(--bg-color);
+    @apply text-white overflow-hidden;
+    transition: background-color 1s ease;
   }
 }
 
 /* Glitch Effect */
 @keyframes glitch {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
+  0% {
+    transform: translate(0);
+  }
+
+  20% {
+    transform: translate(-2px, 2px);
+  }
+
+  40% {
+    transform: translate(-2px, -2px);
+  }
+
+  60% {
+    transform: translate(2px, 2px);
+  }
+
+  80% {
+    transform: translate(2px, -2px);
+  }
+
+  100% {
+    transform: translate(0);
+  }
 }
 
 .animate-glitch {
@@ -29,36 +86,93 @@
 
 /* Data Float Effects */
 @keyframes float-data {
-  0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { transform: translateY(-20vh) translateX(20px); opacity: 0; }
+  0% {
+    transform: translateY(100vh) translateX(0);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-20vh) translateX(20px);
+    opacity: 0;
+  }
 }
 
-.animate-float-data { animation: float-data 8s linear infinite; }
-.animate-float-data-slow { animation: float-data 12s linear infinite; animation-delay: 2s; }
-.animate-float-data-fast { animation: float-data 5s linear infinite; animation-delay: 1s; }
+.animate-float-data {
+  animation: float-data 8s linear infinite;
+}
+
+.animate-float-data-slow {
+  animation: float-data 12s linear infinite;
+  animation-delay: 2s;
+}
+
+.animate-float-data-fast {
+  animation: float-data 5s linear infinite;
+  animation-delay: 1s;
+}
 
 /* Rain Fall Effect */
 @keyframes rain-fall {
-  0% { transform: translateY(-100%) skewX(-15deg); }
-  100% { transform: translateY(1000%) skewX(-15deg); }
+  0% {
+    transform: translateY(-100%) skewX(-15deg);
+  }
+
+  100% {
+    transform: translateY(1000%) skewX(-15deg);
+  }
 }
 
-.animate-rain-fall { animation: rain-fall 0.8s linear infinite; }
-.animate-rain-fall-delayed { animation: rain-fall 1.2s linear infinite; animation-delay: 0.3s; }
-.animate-rain-fall-fast { animation: rain-fall 0.5s linear infinite; }
+.animate-rain-fall {
+  animation: rain-fall 0.8s linear infinite;
+}
+
+.animate-rain-fall-delayed {
+  animation: rain-fall 1.2s linear infinite;
+  animation-delay: 0.3s;
+}
+
+.animate-rain-fall-fast {
+  animation: rain-fall 0.5s linear infinite;
+}
 
 /* Drift Effect (Dust) */
 @keyframes drift {
-  0% { transform: translate(0, 0); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: translate(100px, -50px); opacity: 0; }
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(100px, -50px);
+    opacity: 0;
+  }
 }
 
-.animate-drift { animation: drift 10s ease-in-out infinite; }
-.animate-drift-slow { animation: drift 15s ease-in-out infinite; animation-delay: 2s; }
-.animate-drift-fast { animation: drift 5s ease-in-out infinite; animation-delay: 1s; }
+.animate-drift {
+  animation: drift 10s ease-in-out infinite;
+}
+
+.animate-drift-slow {
+  animation: drift 15s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.animate-drift-fast {
+  animation: drift 5s ease-in-out infinite;
+  animation-delay: 1s;
+}
 
 /* Background Scanlines */
 .scanlines {
@@ -81,4 +195,73 @@
   background: rgba(15, 15, 18, 0.7);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Character & HUD Animations */
+@keyframes breathe {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes talking {
+
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  50% {
+    transform: scaleY(1.03) translateY(-2px);
+  }
+}
+
+@keyframes jump-up {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes damage-shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+.animate-talking {
+  animation: talking 0.4s ease-in-out infinite;
+}
+
+.animate-damage {
+  animation: damage-shake 0.1s ease-in-out 3;
+}
+
+.animate-jump {
+  animation: jump-up 0.3s ease-out 1;
 }

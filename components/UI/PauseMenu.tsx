@@ -2,7 +2,7 @@
 import React from 'react';
 import { useGame } from '../../context/GameContext';
 import { GamePhase } from '../../types';
-import { UI_STRINGS, PHASE_TITLES } from '../../constants';
+import { UI_STRINGS, PHASE_TITLES, DISCORD_LINK } from '../../constants';
 import GlassPanel from './GlassPanel';
 import CyberButton from './CyberButton';
 
@@ -88,6 +88,7 @@ const PauseMenu: React.FC = () => {
                     </div>
 
                     <CyberButton label={ui.PRACTICE_MODE} variant="SECONDARY" onClick={handlePractice} />
+                    <CyberButton label={state.language === 'EN' ? 'SHARE PERFORMANCE' : 'CHIA SẺ THÀNH TÍCH'} variant="SECONDARY" onClick={() => dispatch({ type: 'TOGGLE_SHARE_MODAL' })} />
                     <CyberButton label={ui.FEEDBACK} variant="SECONDARY" onClick={handleFeedback} />
                     <CyberButton label={ui.RESTART} variant="DANGER" onClick={handleRestart} />
                 </div>
@@ -117,12 +118,12 @@ const PauseMenu: React.FC = () => {
                     <CyberButton label={ui.HANDBOOK_TITLE} variant="SECONDARY" onClick={() => dispatch({ type: 'TOGGLE_HANDBOOK' })} />
 
                     <a
-                        href="https://discord.gg/cfQAhSk8"
+                        href={DISCORD_LINK}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-4 py-2 border border-[#5865F2] text-[#5865F2] hover:bg-[#5865F2]/10 transition-colors rounded font-mono text-sm flex items-center justify-center gap-2"
                     >
-                        <span className="text-lg">👾</span> JOIN DISCORD GUILD
+                        <span className="text-lg">👾</span> {state.language === 'EN' ? 'SURVIVOR GUILD (DISCORD)' : 'HỘI QUÁN SINH TỒN (DISCORD)'}
                     </a>
                 </div>
 

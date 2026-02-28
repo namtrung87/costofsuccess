@@ -62,7 +62,7 @@ const VictoryScreen: React.FC = () => {
                     </div>
                     <div className="p-4 bg-gray-900/80 border border-gray-700">
                         <p className="text-[10px] text-gray-500 uppercase tracking-widest">{state.language === 'EN' ? 'CREDITS' : 'NGÂN LƯỢNG'}</p>
-                        <p className="text-xl font-bold text-neonGreen mt-2">${state.credits.toLocaleString()}</p>
+                        <p className="text-xl font-bold text-neonGreen mt-2">${state.budget.toLocaleString()}</p>
                     </div>
                     <div className="p-4 bg-gray-900/80 border border-gray-700">
                         <p className="text-[10px] text-gray-500 uppercase tracking-widest">{state.language === 'EN' ? 'NET WORTH' : 'TỔNG TÀI SẢN'}</p>
@@ -71,30 +71,60 @@ const VictoryScreen: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-4 items-center justify-center pt-8 w-full max-w-sm mx-auto">
-                    <CyberButton
-                        label={t.btn}
-                        variant="PRIMARY"
-                        onClick={handleRestart}
-                        className="px-12 py-6 text-xl shadow-neon-cyan w-full"
-                    />
+                    <div className="flex flex-col gap-3 w-full mt-4">
+                        <CyberButton
+                            label={t.btn}
+                            variant="PRIMARY"
+                            onClick={handleRestart}
+                            className="w-full text-xl shadow-neon-cyan"
+                        />
 
-                    <button
-                        onClick={() => window.open(DISCORD_LINK, '_blank')}
-                        className="w-full py-4 bg-[#5865F2]/20 border border-[#5865F2] text-[#5865F2] font-heading font-bold tracking-widest uppercase hover:bg-[#5865F2] hover:text-white transition-all duration-200 skew-x-[-10deg] shadow-[0_0_15px_rgba(88,101,242,0.3)] mt-2 hover:scale-105 active:scale-95"
-                    >
-                        <span className="inline-block skew-x-[10deg]">
-                            {state.language === 'EN' ? 'BRAG ON DISCORD' : 'KHOE CHIẾN TÍCH TRÊN DISCORD'}
-                        </span>
-                    </button>
+                        {/* New Thematic CTA */}
+                        <button
+                            onClick={() => window.open(DISCORD_LINK, '_blank')}
+                            className="group relative w-full h-16 bg-black border border-[#5865F2] text-[#5865F2] font-mono font-bold tracking-widest uppercase hover:bg-[#5865F2] hover:text-white transition-all duration-300 shadow-[0_0_15px_rgba(88,101,242,0.4)] hover:shadow-[0_0_25px_rgba(88,101,242,0.8)]"
+                        >
+                            <span className="block text-xs opacity-70 mb-1 font-body">
+                                {state.language === 'EN' ? "YOUR REAL JOB OFFER AWAITS" : "THƯ MỜI NHẬN VIỆC THỰC SỰ CỦA BẠN"}
+                            </span>
+                            <span className="relative z-10 font-heading">
+                                {state.language === 'EN' ? 'BECOME A SYSTEM ARCHITECT (DISCORD)' : 'TRỞ THÀNH KIẾN TRÚC SƯ HỆ THỐNG'}
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            {/* Particle Overlay - Fake Confetti */}
-            <div className="absolute inset-0 pointer-events-none opacity-20">
-                <div className="absolute top-10 left-1/4 w-2 h-2 bg-neonCyan rounded-full animate-bounce" />
-                <div className="absolute top-40 right-1/4 w-2 h-2 bg-neonPink rounded-full animate-pulse" />
-                <div className="absolute bottom-20 left-1/3 w-2 h-2 bg-neonGreen rounded-full animate-bounce" />
+            {/* Confetti (Wait, we can do better than just a div) */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {[...Array(50)].map((_, i) => (
+                    <div
+                        key={i}
+                        className="absolute w-2 h-2 rounded-full animate-confetti"
+                        style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `-20px`,
+                            backgroundColor: ['#00F0FF', '#39FF14', '#FF0055', '#FFFB1D'][Math.floor(Math.random() * 4)],
+                            animationDelay: `${Math.random() * 5}s`,
+                            animationDuration: `${3 + Math.random() * 4}s`,
+                            opacity: 0.7
+                        }}
+                    />
+                ))}
             </div>
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                @keyframes confetti {
+                    0% { transform: translateY(0) rotate(0); opacity: 1; }
+                    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+                }
+                .animate-confetti {
+                    animation-name: confetti;
+                    animation-timing-function: linear;
+                    animation-iteration-count: infinite;
+                }
+            `}} />
         </div>
     );
 };

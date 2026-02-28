@@ -1,5 +1,24 @@
-
 import React from 'react';
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlockedAt?: string;
+}
+
+export interface Consequence {
+  type: 'SANITY' | 'BUDGET' | 'FLAG';
+  value: number | string;
+  description?: string;
+}
+
+export enum Difficulty {
+  ZEN = 'ZEN',           // Relaxed, high budget
+  NORMAL = 'NORMAL',     // Standard experience
+  HARDCORE = 'HARDCORE'  // Low starting resources, high stakes
+}
 
 export enum GamePhase {
   START_SCREEN = 'START_SCREEN',
@@ -71,6 +90,19 @@ export interface GameState {
   assets: Record<string, string>;
   loadedBundles: string[];
   textSpeed: number;
+  isAssetsLoading: boolean;
+  percentageLoaded: number;
+  toasts: { id: string; message: string; type: 'success' | 'error' | 'info' }[];
+  isWardrobeOpen: boolean;
+  unlockedAchievements: string[];
+  streak: number;
+  maxStreak: number;
+  equippedAvatar: string;
+  unlockedCosmetics: string[];
+  activeTheme: string;
+  flags: string[];
+  isShareModalOpen: boolean;
+  difficulty: Difficulty;
 }
 
 export interface DialogueNode {
@@ -78,6 +110,7 @@ export interface DialogueNode {
   speaker: string;
   speakerTitle?: string;
   text: string;
+  characterId?: string;
   mood?: 'neutral' | 'happy' | 'angry' | 'surprised';
   backgroundImage?: string;
   characterImage?: string;
@@ -86,6 +119,7 @@ export interface DialogueNode {
     text: string;
     nextId: string;
     action?: (dispatch: React.Dispatch<ActionType>) => void;
+    consequences?: Consequence[];
   }[];
   nextId?: string;
 }
@@ -119,6 +153,19 @@ export type ActionType =
   | { type: 'TOGGLE_MENU' }
   | { type: 'TOGGLE_FEEDBACK' }
   | { type: 'RESTART_PHASE' }
+  | { type: 'RETRY_PHASE' }
   | { type: 'BUY_BOBA' }
   | { type: 'SET_AVATAR'; payload: string }
-  | { type: 'SET_TEXT_SPEED'; payload: number };
+  | { type: 'SET_TEXT_SPEED'; payload: number }
+  | { type: 'SET_ASSETS_LOADING'; payload: { isLoading: boolean; percentage: number } }
+  | { type: 'SHOW_TOAST'; payload: { message: string; type: 'success' | 'error' | 'info' } }
+  | { type: 'REMOVE_TOAST'; payload: string }
+  | { type: 'UNLOCK_ACHIEVEMENT'; payload: string }
+  | { type: 'INCREMENT_STREAK' }
+  | { type: 'RESET_STREAK' }
+  | { type: 'UNLOCK_COSMETIC'; payload: string }
+  | { type: 'EQUIP_COSMETIC'; payload: { type: 'AVATAR' | 'THEME'; id: string } }
+  | { type: 'TOGGLE_WARDROBE' }
+  | { type: 'TOGGLE_SHARE_MODAL' }
+  | { type: 'SET_DIFFICULTY'; payload: Difficulty }
+  | { type: 'RESOLVE_CONSEQUENCES'; payload: Consequence[] };

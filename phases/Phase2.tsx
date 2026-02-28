@@ -5,20 +5,31 @@ import { GamePhase, DialogueNode } from '../types';
 import DialogueBox from '../components/VisualNovel/DialogueBox';
 import CharacterDisplay from '../components/VisualNovel/CharacterDisplay';
 import SortingGame from '../components/Gameplay/SortingGame';
-import PhaseResult from '../components/Gameplay/PhaseResult'; 
-import TutorialOverlay from '../components/UI/TutorialOverlay'; 
+import PhaseResult from '../components/Gameplay/PhaseResult';
+import TutorialOverlay from '../components/UI/TutorialOverlay';
+import BackgroundParallax from '../components/UI/BackgroundParallax';
+import { useAssetPreloader } from '../hooks/useAssetPreloader';
 import { PHASE2_DIALOGUE, SORTING_ITEMS } from '../data/phase2';
-import { TUTORIALS, ASSETS } from '../constants'; 
+import { TUTORIALS, ASSETS } from '../constants';
 
 const Phase2: React.FC = () => {
   const { state, dispatch } = useGame();
   const lang = state.language;
-  
+
+  // Asset Keys for Preloader
+  const assetKeys = [
+    'BG_DESIGN_LAB',
+    'CHAR_KAI_STRESSED',
+    'PHASE_COMPLETE'
+  ];
+
+  const isAssetsLoading = useAssetPreloader(assetKeys);
+
   const [subPhase, setSubPhase] = useState<'DIALOGUE' | 'TUTORIAL' | 'GAME' | 'RESULT'>('DIALOGUE');
   const [currentNodeId, setCurrentNodeId] = useState<string>('start');
   const [currentNode, setCurrentNode] = useState<DialogueNode>(PHASE2_DIALOGUE[lang]['start']);
   const [score, setScore] = useState(0);
-  
+
   const [bgImage, setBgImage] = useState(state.assets[PHASE2_DIALOGUE[lang]['start'].backgroundImage!] || ASSETS.BG_DESIGN_LAB);
 
   useEffect(() => {
@@ -28,19 +39,19 @@ const Phase2: React.FC = () => {
   }, [currentNodeId, lang]);
 
   useEffect(() => {
-      const key = currentNode.backgroundImage;
-      if (key && state.assets[key]) {
-          setBgImage(state.assets[key]);
-      }
+    const key = currentNode.backgroundImage;
+    if (key && state.assets[key]) {
+      setBgImage(state.assets[key]);
+    }
   }, [currentNode, state.assets]);
 
   const handleChoice = (nextId: string, action?: (dispatch: any) => void) => {
     if (action) action(dispatch);
-    
+
     if (nextId === 'START_GAME') {
-      setSubPhase('TUTORIAL'); 
+      setSubPhase('TUTORIAL');
     } else if (nextId === 'END_PHASE') {
-      dispatch({ type: 'SET_PHASE', payload: GamePhase.PHASE_3_ELEMENTS }); 
+      dispatch({ type: 'SET_PHASE', payload: GamePhase.PHASE_3_ELEMENTS });
     } else {
       setCurrentNodeId(nextId);
     }
@@ -48,7 +59,7 @@ const Phase2: React.FC = () => {
 
   const handleDialogueComplete = () => {
     if (currentNode.nextId) {
-       handleChoice(currentNode.nextId);
+      handleChoice(currentNode.nextId);
     }
   };
 
@@ -66,43 +77,40 @@ const Phase2: React.FC = () => {
   };
 
   const handleResultContinue = () => {
-      setSubPhase('DIALOGUE');
-      if (score >= 7) {
-          setCurrentNodeId('post_game_success');
-      } else {
-          setCurrentNodeId('post_game_failure');
-      }
+    setSubPhase('DIALOGUE');
+    if (score >= 7) {
+      setCurrentNodeId('post_game_success');
+    } else {
+      setCurrentNodeId('post_game_failure');
+    }
   };
 
   const handlePractice = () => {
-      setSubPhase('GAME');
-      setScore(0);
+    setSubPhase('GAME');
+    setScore(0);
   };
 
-  const charImage = currentNode.characterId && state.assets[currentNode.characterId] 
-    ? state.assets[currentNode.characterId] 
+  const charImage = currentNode.characterId && state.assets[currentNode.characterId]
+    ? state.assets[currentNode.characterId]
     : currentNode.characterImage;
 
   return (
-    <div className="w-full h-full relative">
-      <div 
-        className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
-        style={{ 
-            backgroundImage: `url(${bgImage})`,
-            filter: 'brightness(0.5)'
-        }}
+    <div className={`w-full h-full relative transition-opacity duration-1000 ${isAssetsLoading ? 'opacity-0' : 'opacity-1'}`}>
+      <BackgroundParallax
+        image={bgImage}
+        intensity={0.03}
       />
 
       {subPhase === 'DIALOGUE' && charImage && (
-          <CharacterDisplay 
-            imageSrc={charImage} 
-            isSpeaker={true} 
-            alignment="RIGHT"
-          />
+        <CharacterDisplay
+          imageSrc={charImage}
+          isSpeaker={true}
+          alignment="RIGHT"
+        />
       )}
 
       {subPhase === 'DIALOGUE' && (
-        <DialogueBox 
+        <DialogueBox
           speaker={currentNode.speaker}
           speakerTitle={currentNode.speakerTitle}
           text={currentNode.text}
@@ -115,32 +123,32 @@ const Phase2: React.FC = () => {
       )}
 
       {subPhase === 'TUTORIAL' && (
-          <TutorialOverlay 
-            title={TUTORIALS.PHASE_2.title}
-            steps={TUTORIALS.PHASE_2.steps}
-            onComplete={() => setSubPhase('GAME')}
-          />
+        <TutorialOverlay
+          title={TUTORIALS.PHASE_2.title}
+          steps={TUTORIALS.PHASE_2.steps}
+          onComplete={() => setSubPhase('GAME')}
+        />
       )}
 
       {subPhase === 'GAME' && (
-        <SortingGame 
-            items={SORTING_ITEMS[lang]}
-            onCorrect={handleGameCorrect}
-            onIncorrect={handleGameIncorrect}
-            onComplete={handleGameComplete}
+        <SortingGame
+          items={SORTING_ITEMS[lang]}
+          onCorrect={handleGameCorrect}
+          onIncorrect={handleGameIncorrect}
+          onComplete={handleGameComplete}
         />
       )}
 
       {subPhase === 'RESULT' && (
-        <PhaseResult 
-            title="Classification Complete"
-            score={score}
-            maxScore={10}
-            feedbackText={score >= 7 ? "Solid work. Expenses separated from Assets." : "Too many errors. Review the handbook."}
-            tipText="Prime Costs follow the product. Period Costs follow time."
-            onContinue={handleResultContinue}
-            onRetry={handlePractice}
-            onPractice={handlePractice}
+        <PhaseResult
+          title="Classification Complete"
+          score={score}
+          maxScore={10}
+          feedbackText={score >= 7 ? "Solid work. Expenses separated from Assets." : "Too many errors. Review the handbook."}
+          tipText="Prime Costs follow the product. Period Costs follow time."
+          onContinue={handleResultContinue}
+          onRetry={handlePractice}
+          onPractice={handlePractice}
         />
       )}
     </div>

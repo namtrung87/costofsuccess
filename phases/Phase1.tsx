@@ -8,12 +8,27 @@ import QuizInterface from '../components/Gameplay/QuizInterface';
 import ContractInterface from '../components/Gameplay/ContractInterface';
 import PhaseResult from '../components/Gameplay/PhaseResult';
 import VfxOverlay from '../components/UI/VfxOverlay';
+import BackgroundParallax from '../components/UI/BackgroundParallax';
+import { useAssetPreloader } from '../hooks/useAssetPreloader';
 import { PHASE1_DIALOGUE, PHASE1_QUIZ } from '../data/phase1';
 import { ASSETS } from '../constants';
 
 const Phase1: React.FC = () => {
   const { state, dispatch } = useGame();
   const lang = state.language;
+
+  // Asset Keys for Preloader
+  const assetKeys = [
+    'BG_LOBBY',
+    'PROP_GATEKEEPER',
+    'CHAR_JULES_NEUTRAL',
+    'CHAR_JULES_SIP',
+    'CHAR_JULES_SMUG',
+    'CHAR_JULES_ANGRY',
+    'CHAR_JULES_HAPPY'
+  ];
+
+  const isAssetsLoading = useAssetPreloader(assetKeys);
 
   const [subPhase, setSubPhase] = useState<'DIALOGUE' | 'QUIZ' | 'CONTRACT' | 'RESULT'>('DIALOGUE');
   const [currentNodeId, setCurrentNodeId] = useState<string>('start');
@@ -103,16 +118,13 @@ const Phase1: React.FC = () => {
 
   const charImage = currentNode.characterId && state.assets[currentNode.characterId]
     ? state.assets[currentNode.characterId]
-    : currentNode.characterImage;
+    : (currentNode.characterImage || 'PLAYER_AVATAR'); // Default fallback
 
   return (
-    <div className="w-full h-full relative scanlines">
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
-        style={{
-          backgroundImage: `url(${bgImage})`,
-          filter: 'brightness(0.6)'
-        }}
+    <div className={`w-full h-full relative scanlines transition-opacity duration-1000 ${isAssetsLoading ? 'opacity-0' : 'opacity-1'}`}>
+      <BackgroundParallax
+        image={bgImage}
+        intensity={0.03}
       />
 
       <VfxOverlay type="data" intensity="low" />
@@ -130,9 +142,12 @@ const Phase1: React.FC = () => {
           speaker={currentNode.speaker}
           speakerTitle={currentNode.speakerTitle}
           text={currentNode.text}
+          characterId={currentNode.characterId}
+          mood={currentNode.mood}
           choices={currentNode.choices?.map(c => ({
             text: c.text,
-            onClick: () => handleChoice(c.nextId, c.action)
+            onClick: () => handleChoice(c.nextId, c.action),
+            consequences: c.consequences
           }))}
           onComplete={handleDialogueComplete}
         />
