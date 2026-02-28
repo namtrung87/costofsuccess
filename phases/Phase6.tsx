@@ -18,7 +18,7 @@ const Phase6: React.FC = () => {
     'BG_MAINFRAME'
   ];
 
-  const isAssetsLoading = useAssetPreloader(assetKeys);
+  const isAssetsLoading = useAssetPreloader();
 
   const [subPhase, setSubPhase] = useState<'DIALOGUE' | 'GAME'>('DIALOGUE');
   const [currentNodeId, setCurrentNodeId] = useState<string>('start');
@@ -59,9 +59,9 @@ const Phase6: React.FC = () => {
           speakerTitle={currentNode.speakerTitle}
           text={currentNode.text}
           choices={currentNode.choices?.map(c => ({
-text: c.text, onClick: () => handleChoice(c.nextId, c.action),
-consequences: c.consequences,
-requiredBudget: c.requiredBudget
+            text: c.text, onClick: () => handleChoice(c.nextId, c.action),
+            consequences: c.consequences,
+            requiredBudget: c.requiredBudget
           }))}
           onComplete={() => currentNode.nextId && handleChoice(currentNode.nextId)}
         />

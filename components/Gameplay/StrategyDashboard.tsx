@@ -36,9 +36,11 @@ const StrategyDashboard: React.FC<StrategyDashboardProps> = ({
         let totalContrib = 0;
 
         Object.entries(allocations).forEach(([id, qty]) => {
-            const p = data.products.find(prod => prod.id === id)!;
-            materialUsed += qty * p.materialNeeded;
-            totalContrib += qty * (p.price - p.variableCost);
+            const p = data.products.find(prod => prod.id === id);
+            if (p) {
+                materialUsed += Number(qty) * Number(p.materialNeeded);
+                totalContrib += Number(qty) * (Number(p.price) - Number(p.variableCost));
+            }
         });
 
         setCurrentMaterialLeft(data.totalAvailableMaterial - materialUsed);

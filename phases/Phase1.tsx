@@ -28,7 +28,7 @@ const Phase1: React.FC = () => {
     'CHAR_JULES_HAPPY'
   ];
 
-  const isAssetsLoading = useAssetPreloader(assetKeys);
+  const isAssetsLoading = useAssetPreloader();
 
   const [subPhase, setSubPhase] = useState<'DIALOGUE' | 'QUIZ' | 'CONTRACT' | 'RESULT'>('DIALOGUE');
   const [currentNodeId, setCurrentNodeId] = useState<string>('start');

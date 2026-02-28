@@ -70,7 +70,7 @@ const PlaceholderPhase: React.FC<{ name: string }> = ({ name }) => (
 );
 
 interface ErrorBoundaryProps {
-  children?: ReactNode;
+  children?: React.ReactNode;
 }
 
 interface ErrorBoundaryState {
@@ -78,8 +78,14 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-class ErrorBoundary extends React.Component<React.PropsWithChildren<ErrorBoundaryProps>, ErrorBoundaryState> {
-  state: ErrorBoundaryState = { hasError: false, error: null };
+class ErrorBoundary extends React.Component<any, any> {
+  declare props: any;
+  declare state: any;
+
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
 
   static getDerivedStateFromError(error: Error) {
     return { hasError: true, error };
@@ -87,6 +93,20 @@ class ErrorBoundary extends React.Component<React.PropsWithChildren<ErrorBoundar
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+
+    // Simple Error Tracking Telemetry (Fire and Forget)
+    try {
+      fetch('/api/track-error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: error.message,
+          stack: error.stack,
+          info: errorInfo.componentStack,
+          timestamp: new Date().toISOString()
+        })
+      }).catch(() => { }); // ignore network errors
+    } catch { }
   }
 
   render() {

@@ -129,7 +129,7 @@ const ShareCardGenerator: React.FC<ShareCardGeneratorProps> = ({ onReady }) => {
 
             const recentIds = state.unlockedAchievements.slice(-3);
             recentIds.forEach((id, idx) => {
-                const achievement = ACHIEVEMENTS.find(a => a.id === id);
+                const achievement = ACHIEVEMENTS[id];
                 if (achievement) {
                     const x = (canvas.width / 2) - (1 - idx) * 200;
                     ctx.fillStyle = 'rgba(0, 240, 255, 0.1)';

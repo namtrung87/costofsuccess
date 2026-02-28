@@ -8,7 +8,7 @@ const GameContext = createContext<{
   dispatch: React.Dispatch<ActionType>;
 } | undefined>(undefined);
 
-const gameReducer = (state: GameState, action: ActionType): GameState => {
+export const gameReducer = (state: GameState, action: ActionType): GameState => {
   switch (action.type) {
     case 'SET_LANGUAGE':
       return { ...state, language: action.payload };
@@ -265,6 +265,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // --- GAMEPLAY TWIST: SANITY DECAY LOOP ---
   useEffect(() => {
     // Don't decay in non-gameplay phases
+    // Don't decay in non-gameplay phases
     const isSafeZone = [
       GamePhase.START_SCREEN,
       GamePhase.GAME_OVER,
@@ -289,11 +290,20 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         decayInterval = 5000;
       }
 
-      const decayTimer = setInterval(() => {
-        dispatch({ type: 'UPDATE_SANITY', payload: -1 });
-      }, decayInterval);
+      // Start Web Worker Timer
+      const worker = new Worker(new URL('../workers/gameWorker.ts', import.meta.url), { type: 'module' });
+      worker.postMessage({ type: 'START_SANITY_TIMER', payload: { interval: decayInterval } });
 
-      return () => clearInterval(decayTimer);
+      worker.onmessage = (e) => {
+        if (e.data.type === 'TICK_SANITY') {
+          dispatch({ type: 'UPDATE_SANITY', payload: -1 });
+        }
+      };
+
+      return () => {
+        worker.postMessage({ type: 'STOP_SANITY_TIMER' });
+        worker.terminate();
+      };
     }
   }, [state.currentPhase, state.activeModal]);
   // Removed state.sanity from dependency array to prevent timer reset on every update.
@@ -365,26 +375,34 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       { name: 'MARKET STABILIZED', description: 'VOLATILITY SUBSIDING', type: 'neutral', costMult: 1.0, rewardMult: 1.0, sanityMult: 1.0 },
     ];
 
-    const interval = setInterval(() => {
-      // 25% chance of event change every 20 seconds
-      if (Math.random() < 0.25) {
-        const randomEvent = events[Math.floor(Math.random() * events.length)];
-        const payload = randomEvent.name === 'MARKET STABILIZED' ? null : randomEvent;
-        dispatch({ type: 'SET_MARKET_EVENT', payload });
+    const worker = new Worker(new URL('../workers/gameWorker.ts', import.meta.url), { type: 'module' });
+    worker.postMessage({ type: 'START_MARKET_TIMER' });
 
-        if (payload) {
-          dispatch({
-            type: 'SHOW_TOAST',
-            payload: {
-              message: `MARKET ALERT: ${payload.name}`,
-              type: payload.type === 'positive' ? 'success' : payload.type === 'negative' ? 'error' : 'info'
-            }
-          });
+    worker.onmessage = (e) => {
+      if (e.data.type === 'TICK_MARKET') {
+        // 25% chance of event change every 20 seconds
+        if (Math.random() < 0.25) {
+          const randomEvent = events[Math.floor(Math.random() * events.length)];
+          const payload = randomEvent.name === 'MARKET STABILIZED' ? null : randomEvent;
+          dispatch({ type: 'SET_MARKET_EVENT', payload });
+
+          if (payload) {
+            dispatch({
+              type: 'SHOW_TOAST',
+              payload: {
+                message: `MARKET ALERT: ${payload.name}`,
+                type: payload.type === 'positive' ? 'success' : payload.type === 'negative' ? 'error' : 'info'
+              }
+            });
+          }
         }
       }
-    }, 20000);
+    };
 
-    return () => clearInterval(interval);
+    return () => {
+      worker.postMessage({ type: 'STOP_MARKET_TIMER' });
+      worker.terminate();
+    };
   }, [state.currentPhase]);
 
   return (

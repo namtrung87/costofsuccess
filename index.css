@@ -100,10 +100,12 @@
 
 .animate-shimmer {
   animation: shimmer 2s infinite linear;
+  will-change: transform;
 }
 
 .animate-glitch {
   animation: glitch 0.2s ease-in-out infinite;
+  will-change: transform;
 }
 
 /* Data Float Effects */
@@ -217,6 +219,7 @@
   background: rgba(15, 15, 18, 0.7);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  will-change: transform, opacity;
 }
 
 /* Character & HUD Animations */
@@ -274,6 +277,7 @@
 
 .animate-breathe {
   animation: breathe 4s ease-in-out infinite;
+  will-change: transform;
 }
 
 .animate-talking {
