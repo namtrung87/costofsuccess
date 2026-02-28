@@ -7,6 +7,8 @@ import SanityMeter from './SanityMeter';
 import BudgetTicker from './BudgetTicker';
 import { XPToast } from '../UI/XPToast';
 import { ComboCounter } from '../UI/ComboCounter';
+import MarketTicker from './MarketTicker';
+import OARTracker from './OARTracker';
 
 const GameHUD: React.FC = () => {
     const { state, dispatch } = useGame();
@@ -29,11 +31,16 @@ const GameHUD: React.FC = () => {
         <div className="fixed top-0 left-0 right-0 p-4 md:p-6 z-[100] pointer-events-none h-screen flex flex-col justify-between">
             <XPToast />
             <ComboCounter />
+            <MarketTicker />
 
             <div className="flex justify-between items-start w-full">
                 {/* Left: Health - Positioned for top-left glance */}
                 <div className="pointer-events-auto scale-90 md:scale-100 origin-top-left">
                     <SanityMeter />
+                </div>
+
+                <div className="pointer-events-auto hidden md:block">
+                    <OARTracker />
                 </div>
 
                 {/* Center Dock - Redesigned for mobile thumb reach (moved to bottom on mobile?) */}
@@ -88,6 +95,22 @@ const GameHUD: React.FC = () => {
                     </button>
 
                     <button
+                        onClick={() => dispatch({ type: 'TOGGLE_DASHBOARD' })}
+                        className="w-10 h-10 rounded-full border-2 border-neonCyan text-neonCyan bg-neonCyan/10 flex items-center justify-center hover:bg-neonCyan hover:text-black hover:shadow-[0_0_15px_#00F0FF] transition-all"
+                        title="Strategic Dashboard"
+                    >
+                        <span className="text-xl">📈</span>
+                    </button>
+
+                    <button
+                        onClick={() => dispatch({ type: 'TOGGLE_BOBA_SHOP' })}
+                        className="w-10 h-10 rounded-full border-2 border-neonPink text-neonPink bg-neonPink/10 flex items-center justify-center hover:bg-neonPink hover:text-black hover:shadow-[0_0_15px_#FF0055] transition-all"
+                        title="Boba Shop"
+                    >
+                        <span className="text-xl">🧋</span>
+                    </button>
+
+                    <button
                         onClick={() => dispatch({ type: 'TOGGLE_MENU' })}
                         className="w-10 h-10 rounded-full border-2 border-neonPink text-neonPink bg-neonPink/10 flex items-center justify-center hover:bg-neonPink hover:text-black hover:shadow-[0_0_15px_#FF0055] transition-all"
                         title="Pause Menu"
@@ -131,6 +154,20 @@ const GameHUD: React.FC = () => {
                         className="w-12 h-12 rounded-xl border-2 border-neonGreen text-neonGreen bg-neonGreen/10 flex items-center justify-center shadow-[0_0_10px_rgba(57,255,20,0.3)]"
                     >
                         <span className="text-xl">📊</span>
+                    </button>
+
+                    <button
+                        onClick={() => dispatch({ type: 'TOGGLE_DASHBOARD' })}
+                        className="w-12 h-12 rounded-xl border-2 border-neonCyan text-neonCyan bg-neonCyan/10 flex items-center justify-center"
+                    >
+                        <span className="text-xl">📈</span>
+                    </button>
+
+                    <button
+                        onClick={() => dispatch({ type: 'TOGGLE_BOBA_SHOP' })}
+                        className="w-12 h-12 rounded-xl border-2 border-neonPink text-neonPink bg-neonPink/10 flex items-center justify-center"
+                    >
+                        <span className="text-xl">🧋</span>
                     </button>
 
                     <button

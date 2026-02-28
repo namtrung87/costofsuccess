@@ -147,7 +147,8 @@ const Phase1: React.FC = () => {
           choices={currentNode.choices?.map(c => ({
             text: c.text,
             onClick: () => handleChoice(c.nextId, c.action),
-            consequences: c.consequences
+            consequences: c.consequences,
+            requiredBudget: c.requiredBudget
           }))}
           onComplete={handleDialogueComplete}
         />

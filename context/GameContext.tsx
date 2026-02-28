@@ -43,12 +43,13 @@ const gameReducer = (state: GameState, action: ActionType): GameState => {
       if (state.unlockedPhases.includes(action.payload)) return state;
       return { ...state, unlockedPhases: [...state.unlockedPhases, action.payload] };
     case 'UPDATE_SANITY':
-      // Prevent updates if already dead to avoid loops
       if (state.currentPhase === GamePhase.GAME_OVER) return state;
-      const newSanity = Math.max(0, Math.min(100, state.sanity + action.payload));
-      return { ...state, sanity: newSanity };
+      const sMult = state.multipliers?.sanity ?? 1;
+      const finalSanityChange = action.payload < 0 ? action.payload * sMult : action.payload; // Multiplier only applies to drain
+      return { ...state, sanity: Math.max(0, Math.min(100, state.sanity + finalSanityChange)) };
     case 'UPDATE_BUDGET':
-      return { ...state, budget: Math.max(0, state.budget + action.payload) };
+      const bMult = action.payload > 0 ? (state.multipliers?.reward ?? 1) : (state.multipliers?.cost ?? 1);
+      return { ...state, budget: Math.max(0, state.budget + (action.payload * bMult)) };
     case 'ADD_INVENTORY':
       if (state.inventory.includes(action.payload)) return state;
       return { ...state, inventory: [...state.inventory, action.payload] };
@@ -79,15 +80,6 @@ const gameReducer = (state: GameState, action: ActionType): GameState => {
         sanity: 100,
         budget: Math.max(state.budget, 1000) // Give a small pity budget if they were broke
       };
-    case 'BUY_BOBA':
-      if (state.budget >= 50 && state.sanity < 100) {
-        return {
-          ...state,
-          budget: state.budget - 50,
-          sanity: Math.min(100, state.sanity + 20) // Restore 20 Sanity
-        };
-      }
-      return state;
     case 'SET_AVATAR':
       return { ...state, playerAvatar: action.payload };
     case 'SET_TEXT_SPEED':
@@ -130,6 +122,16 @@ const gameReducer = (state: GameState, action: ActionType): GameState => {
       return { ...state, isWardrobeOpen: !state.isWardrobeOpen };
     case 'TOGGLE_SHARE_MODAL':
       return { ...state, isShareModalOpen: !state.isShareModalOpen };
+    case 'TOGGLE_DASHBOARD':
+      return { ...state, isDashboardOpen: !state.isDashboardOpen };
+    case 'TOGGLE_BOBA_SHOP':
+      return { ...state, isBobaShopOpen: !state.isBobaShopOpen };
+    case 'BUY_BOBA':
+      return {
+        ...state,
+        budget: state.budget - action.payload.cost,
+        sanity: Math.min(100, state.sanity + action.payload.sanityHeal)
+      };
     case 'SET_DIFFICULTY':
       const settings = DIFFICULTY_SETTINGS[action.payload];
       return {
@@ -137,6 +139,12 @@ const gameReducer = (state: GameState, action: ActionType): GameState => {
         difficulty: action.payload,
         budget: settings.startingBudget,
         sanity: settings.startingSanity
+      };
+    case 'SET_MARKET_EVENT':
+      return {
+        ...state,
+        marketEvent: action.payload ? { name: action.payload.name, description: action.payload.description, type: action.payload.type } : null,
+        multipliers: action.payload ? { cost: action.payload.costMult, reward: action.payload.rewardMult, sanity: action.payload.sanityMult } : { cost: 1, reward: 1, sanity: 1 }
       };
     case 'RESOLVE_CONSEQUENCES':
       let newState = { ...state };
@@ -191,7 +199,9 @@ const init = (initialState: GameState): GameState => {
         equippedAvatar: progress.equippedAvatar || 'avatar_default',
         unlockedCosmetics: progress.unlockedCosmetics || ['avatar_default', 'theme_default'],
         activeTheme: progress.activeTheme || 'theme_default',
-        flags: progress.flags || []
+        flags: progress.flags || [],
+        isDashboardOpen: false, // Reset on reload
+        isBobaShopOpen: false // Reset on reload
       };
     }
 
@@ -318,6 +328,41 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
   }, [state.currentPhase, state.loadedBundles]);
+
+  // --- MARKET VOLATILITY LOOP (NEW) ---
+  useEffect(() => {
+    const isGameplay = ![GamePhase.START_SCREEN, GamePhase.GAME_OVER, GamePhase.VICTORY].includes(state.currentPhase);
+    if (!isGameplay) return;
+
+    const events = [
+      { name: 'FABRIC SHORTAGE', description: 'SUPPLY CHAIN COLLAPSE IN SECTOR 7', type: 'negative', costMult: 1.5, rewardMult: 1.0, sanityMult: 1.2 },
+      { name: 'GLOBAL HYPE SURGE', description: 'VIRAL TRENDING IN NEO-TOKYO', type: 'positive', costMult: 1.1, rewardMult: 2.0, sanityMult: 0.8 },
+      { name: 'AUDIT PRESSURE', description: 'INTERNAL AFFAIRS PROBING DEPT B', type: 'negative', costMult: 1.0, rewardMult: 0.8, sanityMult: 2.5 },
+      { name: 'SYNERGY BOOST', description: 'COFFEE MACHINE FIXED AT LOBBY', type: 'positive', costMult: 0.9, rewardMult: 1.2, sanityMult: 0.5 },
+      { name: 'MARKET STABILIZED', description: 'VOLATILITY SUBSIDING', type: 'neutral', costMult: 1.0, rewardMult: 1.0, sanityMult: 1.0 },
+    ];
+
+    const interval = setInterval(() => {
+      // 25% chance of event change every 20 seconds
+      if (Math.random() < 0.25) {
+        const randomEvent = events[Math.floor(Math.random() * events.length)];
+        const payload = randomEvent.name === 'MARKET STABILIZED' ? null : randomEvent;
+        dispatch({ type: 'SET_MARKET_EVENT', payload });
+
+        if (payload) {
+          dispatch({
+            type: 'SHOW_TOAST',
+            payload: {
+              message: `MARKET ALERT: ${payload.name}`,
+              type: payload.type === 'positive' ? 'success' : payload.type === 'negative' ? 'error' : 'info'
+            }
+          });
+        }
+      }
+    }, 20000);
+
+    return () => clearInterval(interval);
+  }, [state.currentPhase]);
 
   return (
     <GameContext.Provider value={{ state, dispatch }}>

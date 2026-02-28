@@ -14,6 +14,8 @@ import LoadingScreen from './components/UI/LoadingScreen';
 import CyberOverlay from './components/UI/CyberOverlay';
 import WardrobeModal from './components/UI/WardrobeModal';
 import ShareModal from './components/UI/ShareModal';
+import CostDashboard from './components/UI/CostDashboard';
+import BobaShop from './components/Gameplay/BobaShop';
 import StartScreen from './phases/StartScreen';
 
 // Lazy Load Phases - Explicit Relative Paths
@@ -243,6 +245,8 @@ const GameContent: React.FC = () => {
       <CyberOverlay />
       <WardrobeModal />
       <ShareModal />
+      <CostDashboard />
+      <BobaShop />
 
       {/* HUD (Heads Up Display) */}
       <GameHUD />

@@ -103,6 +103,10 @@ export interface GameState {
   flags: string[];
   isShareModalOpen: boolean;
   difficulty: Difficulty;
+  isDashboardOpen: boolean;
+  isBobaShopOpen: boolean;
+  marketEvent: { name: string; description: string; type: 'neutral' | 'positive' | 'negative' } | null;
+  multipliers: { cost: number; reward: number; sanity: number };
 }
 
 export interface DialogueNode {
@@ -114,12 +118,14 @@ export interface DialogueNode {
   mood?: 'neutral' | 'happy' | 'angry' | 'surprised';
   backgroundImage?: string;
   characterImage?: string;
-  characterId?: string;
+  requiredBudget?: number; // Tier 4.4
+  condition?: (state: any) => boolean; // Using 'any' for now to avoid circular ref if needed, or specify GameState
   choices?: {
     text: string;
     nextId: string;
     action?: (dispatch: React.Dispatch<ActionType>) => void;
     consequences?: Consequence[];
+    requiredBudget?: number;
   }[];
   nextId?: string;
 }
@@ -154,7 +160,9 @@ export type ActionType =
   | { type: 'TOGGLE_FEEDBACK' }
   | { type: 'RESTART_PHASE' }
   | { type: 'RETRY_PHASE' }
-  | { type: 'BUY_BOBA' }
+  | { type: 'TOGGLE_DASHBOARD' }
+  | { type: 'TOGGLE_BOBA_SHOP' }
+  | { type: 'BUY_BOBA'; payload: { cost: number; sanityHeal: number } }
   | { type: 'SET_AVATAR'; payload: string }
   | { type: 'SET_TEXT_SPEED'; payload: number }
   | { type: 'SET_ASSETS_LOADING'; payload: { isLoading: boolean; percentage: number } }
@@ -168,4 +176,5 @@ export type ActionType =
   | { type: 'TOGGLE_WARDROBE' }
   | { type: 'TOGGLE_SHARE_MODAL' }
   | { type: 'SET_DIFFICULTY'; payload: Difficulty }
+  | { type: 'SET_MARKET_EVENT'; payload: { name: string; description: string; type: 'neutral' | 'positive' | 'negative'; costMult: number; rewardMult: number; sanityMult: number } | null }
   | { type: 'RESOLVE_CONSEQUENCES'; payload: Consequence[] };

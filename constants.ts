@@ -132,6 +132,10 @@ export const INITIAL_STATE: GameState = {
   activeTheme: 'theme_default',
   isWardrobeOpen: false,
   isShareModalOpen: false,
+  isDashboardOpen: false,
+  isBobaShopOpen: false,
+  marketEvent: null,
+  multipliers: { cost: 1, reward: 1, sanity: 1 },
   flags: [],
   difficulty: 'NORMAL' as any // Will be initialized correctly in context
 };

@@ -58,7 +58,11 @@ const Phase6: React.FC = () => {
           speaker={currentNode.speaker}
           speakerTitle={currentNode.speakerTitle}
           text={currentNode.text}
-          choices={currentNode.choices?.map(c => ({ text: c.text, onClick: () => handleChoice(c.nextId, c.action) }))}
+          choices={currentNode.choices?.map(c => ({
+text: c.text, onClick: () => handleChoice(c.nextId, c.action),
+consequences: c.consequences,
+requiredBudget: c.requiredBudget
+          }))}
           onComplete={() => currentNode.nextId && handleChoice(currentNode.nextId)}
         />
       )}

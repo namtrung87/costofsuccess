@@ -12,7 +12,12 @@ interface DialogueBoxProps {
     characterId?: string;
     mood?: string;
     onComplete?: () => void;
-    choices?: { text: string; onClick: () => void; consequences?: Consequence[] }[];
+    choices?: {
+        text: string;
+        onClick: () => void;
+        consequences?: Consequence[];
+        requiredBudget?: number;
+    }[];
 }
 
 const DialogueBox: React.FC<DialogueBoxProps> = React.memo(({ speaker, speakerTitle, text, choices, onComplete }) => {
@@ -176,33 +181,52 @@ const DialogueBox: React.FC<DialogueBoxProps> = React.memo(({ speaker, speakerTi
                         }}
                         className="absolute bottom-full mb-4 w-full flex flex-col gap-3 items-center"
                     >
-                        {choices.map((choice, idx) => (
-                            <motion.button
-                                key={idx}
-                                variants={{
-                                    hidden: { opacity: 0, scale: 0.9, y: 10 },
-                                    visible: { opacity: 1, scale: 1, y: 0 }
-                                }}
-                                whileHover={{ scale: 1.05, boxShadow: "0px 0px 15px rgba(0, 240, 255, 0.5)" }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    playSFX('CLICK');
-                                    if (choice.consequences) {
-                                        dispatch({ type: 'RESOLVE_CONSEQUENCES', payload: choice.consequences });
-                                    }
-                                    choice.onClick();
-                                }}
-                                className="
-                                    bg-black/90 border border-neonCyan text-white font-heading font-bold py-3 px-8 
-                                    rounded hover:bg-neonCyan hover:text-black
-                                    transition-colors duration-200
-                                    w-full md:w-auto md:min-w-[400px] text-center
-                                "
-                            >
-                                {choice.text}
-                            </motion.button>
-                        ))}
+                        {choices.map((choice, idx) => {
+                            const isLocked = choice.requiredBudget !== undefined && state.budget < choice.requiredBudget;
+
+                            return (
+                                <motion.button
+                                    key={idx}
+                                    disabled={isLocked}
+                                    variants={{
+                                        hidden: { opacity: 0, scale: 0.9, y: 10 },
+                                        visible: { opacity: 1, scale: 1, y: 0 }
+                                    }}
+                                    whileHover={!isLocked ? { scale: 1.05, boxShadow: "0px 0px 15px rgba(0, 240, 255, 0.5)" } : {}}
+                                    whileTap={!isLocked ? { scale: 0.95 } : {}}
+                                    onClick={(e) => {
+                                        if (isLocked) return;
+                                        e.stopPropagation();
+                                        playSFX('CLICK');
+                                        if (choice.consequences) {
+                                            dispatch({ type: 'RESOLVE_CONSEQUENCES', payload: choice.consequences });
+                                        }
+                                        choice.onClick();
+                                    }}
+                                    className={`
+                                        font-heading font-bold py-3 px-8 rounded transition-all duration-200
+                                        w-full md:w-auto md:min-w-[400px] text-center relative overflow-hidden
+                                        ${isLocked
+                                            ? 'bg-gray-900/80 border-gray-700 text-gray-500 cursor-not-allowed grayscale'
+                                            : 'bg-black/90 border border-neonCyan text-white hover:bg-neonCyan hover:text-black shadow-[0_0_10px_rgba(0,240,255,0.2)]'
+                                        }
+                                    `}
+                                >
+                                    <div className="flex items-center justify-center gap-2">
+                                        {isLocked && <span className="text-xs">🔒</span>}
+                                        <span>{choice.text}</span>
+                                        {choice.requiredBudget !== undefined && (
+                                            <span className={`text-[10px] ml-2 font-mono ${isLocked ? 'text-red-500' : 'text-neonGreen'}`}>
+                                                (${choice.requiredBudget})
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Locked Scanline Overlay */}
+                                    {isLocked && <div className="absolute inset-0 bg-black/40 pointer-events-none" />}
+                                </motion.button>
+                            );
+                        })}
                     </motion.div>
                 )}
             </AnimatePresence>
