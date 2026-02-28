@@ -14,10 +14,16 @@ const OARTracker: React.FC = () => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="hidden lg:flex items-center gap-3 px-4 py-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-xl"
+            drag
+            dragMomentum={false}
+            className="hidden lg:flex items-center gap-3 px-4 py-2 bg-black/70 backdrop-blur-md border border-neonCyan/30 rounded-xl pointer-events-auto cursor-grab active:cursor-grabbing shadow-[0_0_15px_rgba(0,240,255,0.1)]"
         >
+            {/* Minimal Drag Handle */}
+            <div className="flex flex-col gap-0.5 opacity-30 px-1 border-r border-white/10">
+                <div className="w-0.5 h-0.5 bg-white rounded-full" />
+                <div className="w-0.5 h-0.5 bg-white rounded-full" />
+                <div className="w-0.5 h-0.5 bg-white rounded-full" />
+            </div>
             <div className={`p-1.5 rounded-lg ${isHealthy ? 'bg-neonGreen/20 text-neonGreen' : 'bg-neonPink/20 text-neonPink'}`}>
                 <Target className="w-4 h-4" />
             </div>

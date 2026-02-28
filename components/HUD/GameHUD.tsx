@@ -46,7 +46,7 @@ const GameHUD: React.FC = () => {
                 </div>
 
                 {showOAR && (
-                    <div className="pointer-events-auto hidden md:block">
+                    <div className="pointer-events-auto hidden md:block mx-4">
                         <OARTracker />
                     </div>
                 )}

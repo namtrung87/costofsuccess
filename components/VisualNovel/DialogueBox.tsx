@@ -177,7 +177,7 @@ const DialogueBox: React.FC<DialogueBoxProps> = React.memo(({ speaker, speakerTi
 
             {/* Main Glass Panel */}
             <div
-                className="bg-black/85 backdrop-blur-2xl border border-white/10 p-7 md:p-9 rounded-tr-2xl rounded-bl-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] relative cursor-pointer hover:border-neonCyan/30 transition-all duration-500 overflow-hidden group flex flex-col"
+                className="bg-black/85 backdrop-blur-2xl border border-white/10 p-7 md:p-9 rounded-tr-2xl rounded-bl-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] relative cursor-pointer hover:border-neonCyan/30 transition-all duration-500 group flex flex-col"
                 onClick={handleClick}
             >
                 {/* Visual Accent: Side Bar */}
