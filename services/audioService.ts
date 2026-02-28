@@ -12,6 +12,9 @@ class AudioService {
     private isMuted = false;
     private isInitialized = false;
     private currentIntensity: MusicIntensity = MusicIntensity.SILENT;
+    private stressLevel: number = 100; // 0-100 (Sanity)
+    private stressGain: GainNode | null = null;
+    private stressFilter: BiquadFilterNode | null = null;
 
     // Active nodes
     private musicNodes: AudioScheduledSourceNode[] = [];
@@ -48,13 +51,26 @@ class AudioService {
         compressor.release.value = 0.25;
         compressor.connect(this.audioContext.destination);
 
-        this.masterGain.connect(compressor);
+        this.masterGain.connect(this.stressFilter);
+        this.stressFilter.connect(compressor);
 
         this.isInitialized = true;
 
         if (this.audioContext.state === 'suspended') {
             await this.audioContext.resume();
         }
+    }
+
+    setStressLevel(sanity: number) {
+        if (!this.audioContext || !this.stressFilter) return;
+        this.stressLevel = sanity;
+        const now = this.audioContext.currentTime;
+
+        // 1. Filter: As sanity drops, sound becomes muffled (tunnel vision)
+        // 100 Sanity -> 20000Hz (Clear)
+        // 0 Sanity -> 400Hz (Muffled)
+        const targetFreq = 400 + (sanity / 100) * 19600;
+        this.stressFilter.frequency.exponentialRampToValueAtTime(targetFreq, now + 1.5);
     }
 
     startMusic() {

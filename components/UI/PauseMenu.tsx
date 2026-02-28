@@ -10,7 +10,7 @@ const PauseMenu: React.FC = () => {
     const { state, dispatch } = useGame();
     const ui = UI_STRINGS[state.language];
 
-    if (!state.isMenuOpen) return null;
+    if (state.activeModal !== 'PAUSE') return null;
 
     const handleClose = () => dispatch({ type: 'TOGGLE_MENU' });
 

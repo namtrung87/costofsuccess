@@ -14,9 +14,10 @@ const gameReducer = (state: GameState, action: ActionType): GameState => {
       return { ...state, language: action.payload };
     case 'SET_PHASE':
       // Auto-unlock the new phase if not already unlocked
-      const unlocked = state.unlockedPhases.includes(action.payload)
-        ? state.unlockedPhases
-        : [...state.unlockedPhases, action.payload];
+      const isNewPhase = !state.unlockedPhases.includes(action.payload);
+      const unlocked = isNewPhase
+        ? [...state.unlockedPhases, action.payload]
+        : state.unlockedPhases;
 
       const isGameOver = action.payload === GamePhase.GAME_OVER;
 
@@ -24,6 +25,8 @@ const gameReducer = (state: GameState, action: ActionType): GameState => {
         ...state,
         currentPhase: action.payload,
         unlockedPhases: unlocked,
+        budgetHistory: isNewPhase ? [...state.budgetHistory, state.budget] : state.budgetHistory,
+        sanityHistory: isNewPhase ? [...state.sanityHistory, state.sanity] : state.sanityHistory,
         lastActivePhase: isGameOver ? state.currentPhase : state.lastActivePhase
       };
     case 'ENTER_PRACTICE':
@@ -31,7 +34,7 @@ const gameReducer = (state: GameState, action: ActionType): GameState => {
         ...state,
         lastActivePhase: state.currentPhase,
         currentPhase: GamePhase.PRACTICE_MODE,
-        isMenuOpen: false
+        activeModal: null
       };
     case 'EXIT_PRACTICE':
       return {
@@ -66,13 +69,13 @@ const gameReducer = (state: GameState, action: ActionType): GameState => {
     case 'TOGGLE_MUSIC':
       return { ...state, musicEnabled: !state.musicEnabled };
     case 'TOGGLE_HANDBOOK':
-      return { ...state, isHandbookOpen: !state.isHandbookOpen, isMenuOpen: false, isFeedbackOpen: false };
+      return { ...state, activeModal: state.activeModal === 'HANDBOOK' ? null : 'HANDBOOK' };
     case 'TOGGLE_MENU':
-      return { ...state, isMenuOpen: !state.isMenuOpen, isHandbookOpen: false, isFeedbackOpen: false };
+      return { ...state, activeModal: state.activeModal === 'PAUSE' ? null : 'PAUSE' };
     case 'TOGGLE_FEEDBACK':
-      return { ...state, isFeedbackOpen: !state.isFeedbackOpen, isMenuOpen: false };
+      return { ...state, activeModal: state.activeModal === 'FEEDBACK' ? null : 'FEEDBACK' };
     case 'RESTART_PHASE':
-      return { ...state, isMenuOpen: false, sanity: 100 };
+      return { ...state, activeModal: null, sanity: 100 };
     case 'RETRY_PHASE':
       return {
         ...state,
@@ -118,14 +121,18 @@ const gameReducer = (state: GameState, action: ActionType): GameState => {
       return action.payload.type === 'AVATAR'
         ? { ...state, equippedAvatar: action.payload.id }
         : { ...state, activeTheme: action.payload.id };
+    case 'CLOSE_MODAL':
+      return { ...state, activeModal: null };
     case 'TOGGLE_WARDROBE':
-      return { ...state, isWardrobeOpen: !state.isWardrobeOpen };
+      return { ...state, activeModal: state.activeModal === 'WARDROBE' ? null : 'WARDROBE' };
     case 'TOGGLE_SHARE_MODAL':
-      return { ...state, isShareModalOpen: !state.isShareModalOpen };
+      return { ...state, activeModal: state.activeModal === 'SHARE' ? null : 'SHARE' };
+    case 'TOGGLE_DYK':
+      return { ...state, activeModal: state.activeModal === 'DYK' ? null : 'DYK' };
     case 'TOGGLE_DASHBOARD':
-      return { ...state, isDashboardOpen: !state.isDashboardOpen };
+      return { ...state, activeModal: state.activeModal === 'DASHBOARD' ? null : 'DASHBOARD' };
     case 'TOGGLE_BOBA_SHOP':
-      return { ...state, isBobaShopOpen: !state.isBobaShopOpen };
+      return { ...state, activeModal: state.activeModal === 'BOBA_SHOP' ? null : 'BOBA_SHOP' };
     case 'BUY_BOBA':
       return {
         ...state,
@@ -193,6 +200,8 @@ const init = (initialState: GameState): GameState => {
         unlockedPhases: progress.unlockedPhases,
         budget: progress.budget,
         sanity: progress.sanity,
+        budgetHistory: progress.budgetHistory || [],
+        sanityHistory: progress.sanityHistory || [],
         unlockedAchievements: progress.unlockedAchievements || [],
         streak: progress.streak || 0,
         maxStreak: progress.maxStreak || 0,
@@ -200,8 +209,7 @@ const init = (initialState: GameState): GameState => {
         unlockedCosmetics: progress.unlockedCosmetics || ['avatar_default', 'theme_default'],
         activeTheme: progress.activeTheme || 'theme_default',
         flags: progress.flags || [],
-        isDashboardOpen: false, // Reset on reload
-        isBobaShopOpen: false // Reset on reload
+        activeModal: null // Reset on reload
       };
     }
 
@@ -241,6 +249,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       unlockedPhases: state.unlockedPhases,
       budget: state.budget,
       sanity: state.sanity,
+      budgetHistory: state.budgetHistory,
+      sanityHistory: state.sanityHistory,
       unlockedAchievements: state.unlockedAchievements,
       streak: state.streak,
       maxStreak: state.maxStreak,
@@ -250,7 +260,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       flags: state.flags
     };
     localStorage.setItem('GAME_PROGRESS_V1', JSON.stringify(progress));
-  }, [state.currentPhase, state.unlockedPhases, state.budget, state.sanity, state.unlockedAchievements, state.streak, state.maxStreak, state.equippedAvatar, state.unlockedCosmetics, state.activeTheme, state.flags]);
+  }, [state.currentPhase, state.unlockedPhases, state.budget, state.sanity, state.budgetHistory, state.sanityHistory, state.unlockedAchievements, state.streak, state.maxStreak, state.equippedAvatar, state.unlockedCosmetics, state.activeTheme, state.flags]);
 
   // --- GAMEPLAY TWIST: SANITY DECAY LOOP ---
   useEffect(() => {
@@ -262,7 +272,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     ].includes(state.currentPhase);
 
     // Don't decay if paused/menus open
-    const isPaused = state.isMenuOpen || state.isHandbookOpen || state.isFeedbackOpen;
+    const isPaused = state.activeModal !== null;
 
     if (!isSafeZone && !isPaused) {
       // Difficulty Scaling for Sanity Decay
@@ -285,9 +295,22 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       return () => clearInterval(decayTimer);
     }
-  }, [state.currentPhase, state.isMenuOpen, state.isHandbookOpen, state.isFeedbackOpen]);
+  }, [state.currentPhase, state.activeModal]);
   // Removed state.sanity from dependency array to prevent timer reset on every update.
   // The reducer handles the math based on current state.
+
+  // --- GLOBAL KEYBOARD SHORTCUTS ---
+  useEffect(() => {
+    const handleGlobalKeys = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') dispatch({ type: 'CLOSE_MODAL' });
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        dispatch({ type: 'TOGGLE_DASHBOARD' });
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeys);
+    return () => window.removeEventListener('keydown', handleGlobalKeys);
+  }, []);
 
   // --- GAME OVER TRIGGER ---
   useEffect(() => {

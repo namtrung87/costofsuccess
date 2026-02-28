@@ -4,10 +4,12 @@ import NeonEffect from './NeonEffect';
 interface LoadingScreenProps {
     onComplete?: () => void;
     message?: string;
+    progress?: number;
 }
 
-const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, message = "INITIALIZING CORE SYSTEMS..." }) => {
-    const [progress, setProgress] = useState(0);
+const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, message = "INITIALIZING CORE SYSTEMS...", progress: externalProgress }) => {
+    const [internalProgress, setInternalProgress] = useState(0);
+    const progress = externalProgress !== undefined ? externalProgress : internalProgress;
     const [logs, setLogs] = useState<string[]>([]);
 
     const diagnosticLogs = [
@@ -21,8 +23,9 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, message = "IN
     ];
 
     useEffect(() => {
+        if (externalProgress !== undefined) return;
         const interval = setInterval(() => {
-            setProgress(prev => {
+            setInternalProgress(prev => {
                 if (prev >= 100) {
                     clearInterval(interval);
                     setTimeout(() => onComplete?.(), 500);
@@ -33,7 +36,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete, message = "IN
         }, 100);
 
         return () => clearInterval(interval);
-    }, [onComplete]);
+    }, [onComplete, externalProgress]);
 
     useEffect(() => {
         const logInterval = setInterval(() => {

@@ -6,7 +6,7 @@ import { COSMETICS, CosmeticItem } from '../../data/cosmetics';
 const WardrobeModal: React.FC = () => {
     const { state, dispatch } = useGame();
 
-    if (!state.isWardrobeOpen) return null;
+    if (state.activeModal !== 'WARDROBE') return null;
 
     const handleEquip = (item: CosmeticItem) => {
         dispatch({ type: 'EQUIP_COSMETIC', payload: { type: item.type, id: item.id } });
@@ -62,16 +62,16 @@ const WardrobeModal: React.FC = () => {
                                             key={item.id}
                                             whileHover={isUnlocked ? { y: -5 } : {}}
                                             className={`relative group rounded-2xl border-2 transition-all p-4 flex flex-col items-center text-center ${isEquipped
-                                                    ? 'border-neonGreen bg-neonGreen/5 shadow-[0_0_20px_rgba(57,255,20,0.1)]'
-                                                    : isUnlocked
-                                                        ? 'border-white/10 bg-white/5 hover:border-neonCyan/50 cursor-pointer'
-                                                        : 'border-white/5 bg-transparent opacity-50 grayscale'
+                                                ? 'border-neonGreen bg-neonGreen/5 shadow-[0_0_20px_rgba(57,255,20,0.1)]'
+                                                : isUnlocked
+                                                    ? 'border-white/10 bg-white/5 hover:border-neonCyan/50 cursor-pointer'
+                                                    : 'border-white/5 bg-transparent opacity-50 grayscale'
                                                 }`}
                                             onClick={() => isUnlocked && !isEquipped && handleEquip(item)}
                                         >
                                             {/* Rarity Tag */}
                                             <div className={`absolute top-2 right-2 px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest ${item.rarity === 'LEGENDARY' ? 'bg-orange-500 text-white shadow-[0_0_10px_orange]' :
-                                                    item.rarity === 'RARE' ? 'bg-neonCyan text-black' : 'bg-gray-500 text-white'
+                                                item.rarity === 'RARE' ? 'bg-neonCyan text-black' : 'bg-gray-500 text-white'
                                                 }`}>
                                                 {item.rarity}
                                             </div>

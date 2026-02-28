@@ -48,34 +48,66 @@ const CharacterDisplay: React.FC<CharacterDisplayProps> = ({
         key={imageSrc}
         initial={{
           opacity: 0,
-          x: alignment === 'LEFT' ? -100 : alignment === 'RIGHT' ? 100 : 0,
-          y: alignment === 'CENTER' ? 100 : 0
+          x: alignment === 'LEFT' ? -150 : alignment === 'RIGHT' ? 150 : 0,
+          y: alignment === 'CENTER' ? 150 : 20,
+          scale: 0.95,
+          filter: 'blur(10px)'
         }}
-        animate={{ opacity: 1, x: 0, y: 0 }}
+        animate={{
+          opacity: 1,
+          x: 0,
+          y: 0,
+          scale: 1,
+          filter: 'blur(0px)',
+          // High-Fidelity Breathing & Subtle Float
+          transition: {
+            type: "spring",
+            stiffness: 120,
+            damping: 15,
+            restDelta: 0.001
+          }
+        }}
         exit={{
           opacity: 0,
-          x: alignment === 'LEFT' ? -50 : alignment === 'RIGHT' ? 50 : 0,
-          transition: { duration: 0.2 }
+          x: alignment === 'LEFT' ? -80 : alignment === 'RIGHT' ? 80 : 0,
+          y: 20,
+          scale: 0.95,
+          filter: 'blur(5px)',
+          transition: { duration: 0.3, ease: "easeInOut" }
         }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
         className={`absolute bottom-0 z-20 ${positionClass} ${className}`}
       >
-        <NeonEffect
-          color={isSpeaker ? 'cyan' : 'blue'}
-          intensity={isSpeaker ? 'medium' : 'low'}
-          className={`origin-bottom transition-all duration-700 ${isSpeaker ? 'animate-breathe animate-talking' : 'animate-breathe opacity-70'}`}
+        <motion.div
+          animate={isSpeaker ? {
+            y: [0, -8, 0],
+            scale: [1, 1.01, 1],
+          } : {
+            y: [0, -4, 0],
+            opacity: 0.7
+          }}
+          transition={{
+            duration: isSpeaker ? 3 : 5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
         >
-          <img
-            src={imgError ? fallbackSrc : actualSrc}
-            alt="Character"
-            onError={() => setImgError(true)}
-            className={`
-                      h-[60vh] md:h-[80vh] object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]
-                      transition-all duration-300
-                      ${isSpeaker ? 'filter-none scale-100 translate-y-0' : 'brightness-50 grayscale-[0.3] scale-95 translate-y-4'}
-                  `}
-          />
-        </NeonEffect>
+          <NeonEffect
+            color={isSpeaker ? 'cyan' : 'blue'}
+            intensity={isSpeaker ? 'medium' : 'low'}
+            className="origin-bottom"
+          >
+            <img
+              src={imgError ? fallbackSrc : actualSrc}
+              alt="Character"
+              onError={() => setImgError(true)}
+              className={`
+                        h-[50vh] md:h-[65vh] lg:h-[75vh] max-h-[600px] object-contain drop-shadow-[0_0_30px_rgba(0,0,0,0.6)]
+                        transition-all duration-500 ease-out
+                        ${isSpeaker ? 'filter-none scale-100 translate-y-0' : 'brightness-40 grayscale-[0.4] scale-95 translate-y-6'}
+                    `}
+            />
+          </NeonEffect>
+        </motion.div>
       </motion.div>
     </AnimatePresence>
   );

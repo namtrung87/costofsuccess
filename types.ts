@@ -73,6 +73,8 @@ export enum MusicIntensity {
   TENSION = 'TENSION'    // Bass + Keys + Drums + Synth/Hats
 }
 
+export type ModalType = 'HANDBOOK' | 'PAUSE' | 'FEEDBACK' | 'WARDROBE' | 'SHARE' | 'DASHBOARD' | 'BOBA_SHOP' | 'DYK' | null;
+
 export interface GameState {
   language: Language;
   currentPhase: GamePhase;
@@ -80,20 +82,19 @@ export interface GameState {
   unlockedPhases: GamePhase[];
   sanity: number;
   budget: number;
+  sanityHistory: number[];
+  budgetHistory: number[];
   playerName: string;
   playerAvatar: string; // Gen Z: Identity/Customization
   inventory: string[];
   musicEnabled: boolean;
-  isHandbookOpen: boolean;
-  isMenuOpen: boolean;
-  isFeedbackOpen: boolean; // New State for Feedback
+  activeModal: ModalType; // Replaces multiple isXOpen boolean flags to enforce exclusivity
   assets: Record<string, string>;
   loadedBundles: string[];
   textSpeed: number;
   isAssetsLoading: boolean;
   percentageLoaded: number;
   toasts: { id: string; message: string; type: 'success' | 'error' | 'info' }[];
-  isWardrobeOpen: boolean;
   unlockedAchievements: string[];
   streak: number;
   maxStreak: number;
@@ -101,10 +102,7 @@ export interface GameState {
   unlockedCosmetics: string[];
   activeTheme: string;
   flags: string[];
-  isShareModalOpen: boolean;
   difficulty: Difficulty;
-  isDashboardOpen: boolean;
-  isBobaShopOpen: boolean;
   marketEvent: { name: string; description: string; type: 'neutral' | 'positive' | 'negative' } | null;
   multipliers: { cost: number; reward: number; sanity: number };
 }
@@ -175,6 +173,8 @@ export type ActionType =
   | { type: 'EQUIP_COSMETIC'; payload: { type: 'AVATAR' | 'THEME'; id: string } }
   | { type: 'TOGGLE_WARDROBE' }
   | { type: 'TOGGLE_SHARE_MODAL' }
+  | { type: 'TOGGLE_DYK' }
   | { type: 'SET_DIFFICULTY'; payload: Difficulty }
+  | { type: 'CLOSE_MODAL' }
   | { type: 'SET_MARKET_EVENT'; payload: { name: string; description: string; type: 'neutral' | 'positive' | 'negative'; costMult: number; rewardMult: number; sanityMult: number } | null }
   | { type: 'RESOLVE_CONSEQUENCES'; payload: Consequence[] };

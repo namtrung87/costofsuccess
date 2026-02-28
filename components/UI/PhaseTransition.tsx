@@ -9,18 +9,8 @@ const PhaseTransition: React.FC = () => {
     const { playSFX } = useAudio();
     const [isActive, setIsActive] = useState(false);
     const [displayPhase, setDisplayPhase] = useState('');
-    const [systemLogs, setSystemLogs] = useState<string[]>([]);
-
-    useEffect(() => {
-        const logs = [
-            `DECODING NEURAL_LINK_v2.0...`,
-            `ALLOCATING MEMORY: ${Math.random().toFixed(4)} TB`,
-            `ESTABLISHING SECURE PROTOCOL 0x${Math.floor(Math.random() * 0xFFFFFF).toString(16)}`,
-            `BYPASSING FIREWALL... [SUCCESS]`,
-            `SYNCHRONIZING BIO-METRIC DATA...`,
-        ];
-        setSystemLogs(logs);
-    }, [state.currentPhase]);
+    const [canSkip, setCanSkip] = useState(false);
+    const [subDescription, setSubDescription] = useState('...');
 
     useEffect(() => {
         setIsActive(true);
@@ -30,6 +20,8 @@ const PhaseTransition: React.FC = () => {
         const current = state.currentPhase;
         const match = current.match(/(PHASE_\d+|PRACTICE_MODE)/);
         let title = current.replace('PHASE_', '');
+        let desc = 'System loading...';
+        let phaseNumber = '';
 
         if (match) {
             let key = match[0];
@@ -37,15 +29,28 @@ const PhaseTransition: React.FC = () => {
             if (PHASE_TITLES[key]) {
                 title = PHASE_TITLES[key][state.language];
             }
+            if (key.startsWith('PHASE_')) {
+                phaseNumber = key.replace('PHASE_', '');
+                desc = state.language === 'EN' ? `"Concept: Focus and Strategy"` : `"Khái niệm: Tập trung & Chiến lược"`; // Need actual sub-descriptions here, using fallback
+            }
         }
 
-        setDisplayPhase(title);
+        setDisplayPhase(phaseNumber ? `PHASE ${phaseNumber}: ${title}` : title);
+        setSubDescription(desc);
+
+        // Allow skipping after 800ms
+        const skipTimer = setTimeout(() => {
+            setCanSkip(true);
+        }, 800);
 
         const timer = setTimeout(() => {
             setIsActive(false);
-        }, 2500);
+        }, 1500);
 
-        return () => clearTimeout(timer);
+        return () => {
+            clearTimeout(timer);
+            clearTimeout(skipTimer);
+        }
     }, [state.currentPhase, state.language]);
 
     if (!isActive) return <AnimatePresence />;
@@ -56,7 +61,10 @@ const PhaseTransition: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[999] bg-obsidian flex items-center justify-center overflow-hidden p-4"
+                className="fixed inset-0 z-[999] bg-obsidian flex items-center justify-center overflow-hidden p-4 cursor-pointer"
+                onClick={() => {
+                    if (canSkip) setIsActive(false);
+                }}
             >
                 {/* Background Grid Animation */}
                 <motion.div
@@ -110,11 +118,28 @@ const PhaseTransition: React.FC = () => {
                         <motion.h1
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter uppercase leading-tight break-words"
+                            className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter uppercase leading-tight break-words mb-4"
                             style={{ textShadow: '2px 0 #FF0055, -2px 0 #00F0FF' }}
                         >
                             {displayPhase}
                         </motion.h1>
+                        <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="text-neonCyan font-mono tracking-widest text-sm"
+                        >
+                            {subDescription}
+                        </motion.p>
+                        {canSkip && (
+                            <motion.p
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="absolute -bottom-16 w-full text-center text-[10px] text-white/50 animate-pulse font-mono tracking-[0.2em] uppercase"
+                            >
+                                [ Click / Tap to Skip ]
+                            </motion.p>
+                        )}
                     </div>
 
                     <div className="mt-12 flex justify-center gap-4">

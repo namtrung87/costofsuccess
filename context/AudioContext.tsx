@@ -124,9 +124,15 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   }, [state.currentPhase]);
 
+  // Update Stress / Sanity Audio Effects
+  useEffect(() => {
+    audioService.setStressLevel(state.sanity);
+  }, [state.sanity]);
+
   const initAudio = async () => {
     await audioService.initialize();
     audioService.startMusic();
+    audioService.setStressLevel(state.sanity);
   };
 
   const toggleMute = () => {

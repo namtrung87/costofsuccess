@@ -1,64 +1,52 @@
+import { useState, useEffect } from 'react';
+import { ASSETS } from '../constants';
 
-import { useEffect, useState } from 'react';
-import { useGame } from '../context/GameContext';
-
-/**
- * useAssetPreloader
- * 
- * Logic to ensure all assets for a specific phase are loaded before the phase is revealed.
- * This prevents the "white flash" or popping artifacts during transitions.
- */
-export const useAssetPreloader = (assetKeys: string[]) => {
-    const { state, dispatch } = useGame();
-    const [isInternalLoading, setIsInternalLoading] = useState(true);
+export const useAssetPreloader = () => {
+    const [progress, setProgress] = useState(0);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (assetKeys.length === 0) {
-            setIsInternalLoading(false);
+        const assetUrls = Object.values(ASSETS).filter(url =>
+            typeof url === 'string' && (url.startsWith('http') || url.startsWith('file') || url.startsWith('/assets'))
+        );
+
+        if (assetUrls.length === 0) {
+            setIsLoaded(true);
+            setProgress(100);
             return;
         }
 
-        dispatch({ type: 'SET_ASSETS_LOADING', payload: { isLoading: true, percentage: 0 } });
-        setIsInternalLoading(true);
-
-        const total = assetKeys.length;
-        let loaded = 0;
+        let loadedCount = 0;
+        const total = assetUrls.length;
 
         const handleLoad = () => {
-            loaded++;
-            const percentage = Math.round((loaded / total) * 100);
-            dispatch({ type: 'SET_ASSETS_LOADING', payload: { isLoading: true, percentage } });
-
-            if (loaded === total) {
-                dispatch({ type: 'SET_ASSETS_LOADING', payload: { isLoading: false, percentage: 100 } });
-                setIsInternalLoading(false);
+            loadedCount++;
+            setProgress(Math.floor((loadedCount / total) * 100));
+            if (loadedCount === total) {
+                setIsLoaded(true);
             }
         };
 
-        const handleError = (key: string) => {
-            console.error(`Asset failed to load: ${key}`);
-            handleLoad(); // Continue anyway to not block the game indefinitely
+        const handleError = (url: string) => {
+            console.error(`Failed to load asset: ${url}`);
+            // We still proceed even if one fails
+            handleLoad();
         };
 
-        assetKeys.forEach(key => {
-            const url = state.assets[key];
-            if (!url) {
-                handleLoad();
-                return;
-            }
-
+        assetUrls.forEach(url => {
             const img = new Image();
+            img.onload = handleLoad;
+            img.onerror = () => handleError(url);
             img.src = url;
 
+            // Handle cached images
             if (img.complete) {
-                handleLoad();
-            } else {
-                img.onload = handleLoad;
-                img.onerror = () => handleError(key);
+                // handleLoad(); // This can cause double counting if not careful
             }
         });
 
-    }, [assetKeys, state.assets, dispatch]);
+    }, []);
 
-    return isInternalLoading;
+    return { progress, isLoaded, error };
 };

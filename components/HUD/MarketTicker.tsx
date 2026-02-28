@@ -43,7 +43,7 @@ const MarketTicker: React.FC = () => {
                     <div className="flex-1 overflow-hidden">
                         <motion.div
                             animate={{ x: [400, -1000] }}
-                            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                            transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
                             className="whitespace-nowrap text-[11px] font-mono tracking-wider uppercase font-bold"
                         >
                             {state.marketEvent
@@ -56,11 +56,11 @@ const MarketTicker: React.FC = () => {
                     <div className="shrink-0 flex gap-4 text-[10px] font-mono">
                         <div className="flex items-center gap-1">
                             <span className="opacity-50">OAR:</span>
-                            <span className="text-neonCyan">12.5%</span>
+                            <span className="text-neonCyan">{(state.currentOAR || 0).toFixed(1)}%</span>
                         </div>
                         <div className="flex items-center gap-1">
                             <span className="opacity-50">HYPE:</span>
-                            <span className="text-neonPink">STABLE</span>
+                            <span className="text-neonPink">{state.marketEvent ? state.marketEvent.type.toUpperCase() : 'STABLE'}</span>
                         </div>
                     </div>
                 </motion.div>

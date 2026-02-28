@@ -13,7 +13,7 @@ const BOBA_ITEMS = [
 const BobaShop: React.FC = () => {
     const { state, dispatch } = useGame();
 
-    if (!state.isBobaShopOpen) return null;
+    if (state.activeModal !== 'BOBA_SHOP') return null;
 
     const handlePurchase = (item: typeof BOBA_ITEMS[0]) => {
         if (state.budget >= item.cost) {
@@ -30,7 +30,7 @@ const BobaShop: React.FC = () => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
             <AnimatePresence>
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}

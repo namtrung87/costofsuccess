@@ -33,7 +33,7 @@ const GameHUD: React.FC = () => {
             <ComboCounter />
             <MarketTicker />
 
-            <div className="flex justify-between items-start w-full">
+            <div className="w-full flex justify-between items-start pointer-events-none">
                 {/* Left: Health - Positioned for top-left glance */}
                 <div className="pointer-events-auto scale-90 md:scale-100 origin-top-left">
                     <SanityMeter />
@@ -43,80 +43,96 @@ const GameHUD: React.FC = () => {
                     <OARTracker />
                 </div>
 
-                {/* Center Dock - Redesigned for mobile thumb reach (moved to bottom on mobile?) */}
-                {/* I'll keep it top for now but make it more compact */}
-                <div className="hidden md:flex gap-4 p-2 bg-black/80 backdrop-blur-xl border border-neonCyan/50 rounded-full shadow-[0_0_20px_rgba(0,0,0,0.8)] pointer-events-auto hover:scale-105 transition-transform duration-300 mx-4">
-                    <button
-                        onClick={handleMuteToggle}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all border-2 ${state.musicEnabled ? 'border-neonGreen text-neonGreen bg-neonGreen/10 shadow-[0_0_10px_#39FF14]' : 'border-gray-600 text-gray-600'}`}
-                        title="Toggle Sound"
-                    >
-                        <span className="text-xl">{state.musicEnabled ? '🔊' : '🔇'}</span>
-                    </button>
+                {/* Center Dock - Separated into Settings, Social, and Game Actions */}
+                <div className="hidden md:flex gap-4 mx-4">
+                    {/* Settings / System */}
+                    <div className="flex gap-3 p-2 bg-black/80 backdrop-blur-xl border border-neonCyan/50 rounded-full shadow-[0_0_20px_rgba(0,0,0,0.8)] pointer-events-auto hover:scale-105 transition-transform duration-300">
+                        <button
+                            onClick={handleMuteToggle}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all border-2 ${state.musicEnabled ? 'border-neonGreen text-neonGreen bg-neonGreen/10 shadow-[0_0_10px_#39FF14]' : 'border-gray-600 text-gray-600'}`}
+                            title="Toggle Sound"
+                        >
+                            <span className="text-xl">{state.musicEnabled ? '🔊' : '🔇'}</span>
+                        </button>
 
-                    <button
-                        onClick={toggleLanguage}
-                        className="w-10 h-10 rounded-full border-2 border-white text-white flex items-center justify-center font-black text-xs hover:bg-white hover:text-black transition-all"
-                        title="Switch Language"
-                    >
-                        {state.language}
-                    </button>
+                        <button
+                            onClick={toggleLanguage}
+                            className="w-10 h-10 rounded-full border-2 border-white text-white flex items-center justify-center font-black text-xs hover:bg-white hover:text-black transition-all"
+                            title="Switch Language"
+                        >
+                            {state.language}
+                        </button>
 
-                    <button
-                        onClick={() => dispatch({ type: 'TOGGLE_HANDBOOK' })}
-                        className="w-10 h-10 rounded-full border-2 border-neonCyan text-neonCyan bg-neonCyan/10 flex items-center justify-center hover:bg-neonCyan hover:text-black hover:shadow-[0_0_15px_#00F0FF] transition-all"
-                        title="Open Handbook"
-                    >
-                        <span className="text-xl font-bold">?</span>
-                    </button>
+                        <button
+                            onClick={() => dispatch({ type: 'TOGGLE_MENU' })}
+                            className="w-10 h-10 rounded-full border-2 border-neonPink text-neonPink bg-neonPink/10 flex items-center justify-center hover:bg-neonPink hover:text-black hover:shadow-[0_0_15px_#FF0055] transition-all"
+                            title="Pause Menu"
+                        >
+                            <span className="text-sm font-black">||</span>
+                        </button>
+                    </div>
 
-                    <button
-                        onClick={() => window.open(DISCORD_LINK, '_blank')}
-                        className="w-10 h-10 rounded-full border-2 border-[#5865F2] text-[#5865F2] bg-[#5865F2]/10 flex items-center justify-center hover:bg-[#5865F2] hover:text-white hover:shadow-[0_0_15px_rgba(88,101,242,0.8)] transition-all animate-pulse"
-                        title={state.language === 'EN' ? "CFO's Hotline (Discord)" : "Gọi Vốn Cứu Trợ (Discord)"}
-                    >
-                        <span className="text-xl">🆘</span>
-                    </button>
+                    {/* Social / Help */}
+                    <div className="flex gap-3 p-2 bg-black/80 backdrop-blur-xl border border-neonCyan/50 rounded-full shadow-[0_0_20px_rgba(0,0,0,0.8)] pointer-events-auto hover:scale-105 transition-transform duration-300">
+                        <button
+                            onClick={() => dispatch({ type: 'TOGGLE_HANDBOOK' })}
+                            className="w-10 h-10 rounded-full border-2 border-neonCyan text-neonCyan bg-neonCyan/10 flex items-center justify-center hover:bg-neonCyan hover:text-black hover:shadow-[0_0_15px_#00F0FF] transition-all"
+                            title="Open Handbook"
+                        >
+                            <span className="text-xl font-bold">?</span>
+                        </button>
 
-                    <button
-                        onClick={() => dispatch({ type: 'TOGGLE_WARDROBE' })}
-                        className="w-10 h-10 rounded-full border-2 border-neonCyan text-neonCyan bg-neonCyan/10 flex items-center justify-center hover:bg-neonCyan hover:text-black hover:shadow-[0_0_15px_#00F0FF] transition-all"
-                        title="Wardrobe"
-                    >
-                        <span className="text-xl">👕</span>
-                    </button>
+                        <button
+                            onClick={() => dispatch({ type: 'TOGGLE_DYK' })}
+                            className={`w-10 h-10 rounded-full border-2 border-neonGreen text-neonGreen bg-neonGreen/10 flex items-center justify-center hover:bg-neonGreen hover:text-black hover:shadow-[0_0_15px_#39FF14] transition-all ${state.activeModal === 'DYK' ? 'bg-neonGreen text-black' : ''}`}
+                            title="Did You Know?"
+                        >
+                            <span className="text-xl">💡</span>
+                        </button>
 
-                    <button
-                        onClick={() => dispatch({ type: 'TOGGLE_SHARE_MODAL' })}
-                        className="w-10 h-10 rounded-full border-2 border-neonGreen text-neonGreen bg-neonGreen/10 flex items-center justify-center hover:bg-neonGreen hover:text-black hover:shadow-[0_0_15px_#39FF14] transition-all"
-                        title="Share Score Card"
-                    >
-                        <span className="text-xl">📊</span>
-                    </button>
+                        <button
+                            onClick={() => window.open(DISCORD_LINK, '_blank')}
+                            className="w-10 h-10 rounded-full border-2 border-[#5865F2] text-[#5865F2] bg-[#5865F2]/10 flex items-center justify-center hover:bg-[#5865F2] hover:text-white hover:shadow-[0_0_15px_rgba(88,101,242,0.8)] transition-all"
+                            title={state.language === 'EN' ? "CFO's Hotline (Discord)" : "Gọi Vốn Cứu Trợ (Discord)"}
+                        >
+                            <span className="text-xl">🆘</span>
+                        </button>
+                    </div>
 
-                    <button
-                        onClick={() => dispatch({ type: 'TOGGLE_DASHBOARD' })}
-                        className="w-10 h-10 rounded-full border-2 border-neonCyan text-neonCyan bg-neonCyan/10 flex items-center justify-center hover:bg-neonCyan hover:text-black hover:shadow-[0_0_15px_#00F0FF] transition-all"
-                        title="Strategic Dashboard"
-                    >
-                        <span className="text-xl">📈</span>
-                    </button>
+                    {/* Game Actions */}
+                    <div className="flex gap-3 p-2 bg-black/80 backdrop-blur-xl border border-neonCyan/50 rounded-full shadow-[0_0_20px_rgba(0,0,0,0.8)] pointer-events-auto hover:scale-105 transition-transform duration-300">
+                        <button
+                            onClick={() => dispatch({ type: 'TOGGLE_WARDROBE' })}
+                            className="w-10 h-10 rounded-full border-2 border-neonCyan text-neonCyan bg-neonCyan/10 flex items-center justify-center hover:bg-neonCyan hover:text-black hover:shadow-[0_0_15px_#00F0FF] transition-all"
+                            title="Wardrobe"
+                        >
+                            <span className="text-xl">👕</span>
+                        </button>
 
-                    <button
-                        onClick={() => dispatch({ type: 'TOGGLE_BOBA_SHOP' })}
-                        className="w-10 h-10 rounded-full border-2 border-neonPink text-neonPink bg-neonPink/10 flex items-center justify-center hover:bg-neonPink hover:text-black hover:shadow-[0_0_15px_#FF0055] transition-all"
-                        title="Boba Shop"
-                    >
-                        <span className="text-xl">🧋</span>
-                    </button>
+                        <button
+                            onClick={() => dispatch({ type: 'TOGGLE_SHARE_MODAL' })}
+                            className="w-10 h-10 rounded-full border-2 border-neonGreen text-neonGreen bg-neonGreen/10 flex items-center justify-center hover:bg-neonGreen hover:text-black hover:shadow-[0_0_15px_#39FF14] transition-all"
+                            title="Share Score Card"
+                        >
+                            <span className="text-xl">📊</span>
+                        </button>
 
-                    <button
-                        onClick={() => dispatch({ type: 'TOGGLE_MENU' })}
-                        className="w-10 h-10 rounded-full border-2 border-neonPink text-neonPink bg-neonPink/10 flex items-center justify-center hover:bg-neonPink hover:text-black hover:shadow-[0_0_15px_#FF0055] transition-all"
-                        title="Pause Menu"
-                    >
-                        <span className="text-sm font-black">||</span>
-                    </button>
+                        <button
+                            onClick={() => dispatch({ type: 'TOGGLE_DASHBOARD' })}
+                            className="w-10 h-10 rounded-full border-2 border-neonCyan text-neonCyan bg-neonCyan/10 flex items-center justify-center hover:bg-neonCyan hover:text-black hover:shadow-[0_0_15px_#00F0FF] transition-all"
+                            title="Strategic Dashboard"
+                        >
+                            <span className="text-xl">📈</span>
+                        </button>
+
+                        <button
+                            onClick={() => dispatch({ type: 'TOGGLE_BOBA_SHOP' })}
+                            className="w-10 h-10 rounded-full border-2 border-neonPink text-neonPink bg-neonPink/10 flex items-center justify-center hover:bg-neonPink hover:text-black hover:shadow-[0_0_15px_#FF0055] transition-all"
+                            title="Boba Shop"
+                        >
+                            <span className="text-xl">🧋</span>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Right: Money */}
@@ -125,9 +141,9 @@ const GameHUD: React.FC = () => {
                 </div>
             </div>
 
-            {/* MOBILE NAVIGATION DOCK (Bottom) */}
-            <div className="md:hidden flex justify-center w-full mb-6 pointer-events-none">
-                <div className="flex gap-2 p-2 bg-black/90 backdrop-blur-2xl border-2 border-neonCyan/30 rounded-2xl shadow-[0_-10px_30px_rgba(0,0,0,0.5)] pointer-events-auto">
+            {/* MOBILE NAVIGATION DOCK (Moved to Top) */}
+            <div className="md:hidden flex justify-center w-full mt-2 pointer-events-none">
+                <div className="flex flex-wrap justify-center gap-2 p-2 max-w-[300px] bg-black/90 backdrop-blur-2xl border-2 border-neonCyan/30 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] pointer-events-auto">
                     <button
                         onClick={handleMuteToggle}
                         className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all border-2 ${state.musicEnabled ? 'border-neonGreen text-neonGreen bg-neonGreen/10 shadow-[0_0_10px_#39FF14]' : 'border-gray-600 text-gray-600'}`}
@@ -194,4 +210,4 @@ const GameHUD: React.FC = () => {
     );
 };
 
-export default GameHUD;
+export default React.memo(GameHUD);

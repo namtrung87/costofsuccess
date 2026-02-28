@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, ReactNode } from 'react';
+import React, { useState, useEffect, useRef, ReactNode, useCallback } from 'react';
 import { useGame } from '../../context/GameContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAudio } from '../../context/AudioContext';
@@ -28,6 +28,7 @@ const DialogueBox: React.FC<DialogueBoxProps> = React.memo(({ speaker, speakerTi
     const [renderedContent, setRenderedContent] = useState<ReactNode | string>('');
 
     const typeIntervalRef = useRef<any>(null);
+    const lastClickTimeRef = useRef<number>(0);
 
     // Typewriter effect
     useEffect(() => {
@@ -85,7 +86,11 @@ const DialogueBox: React.FC<DialogueBoxProps> = React.memo(({ speaker, speakerTi
         }
     }, [isTyping, displayedText, text, state.language]);
 
-    const handleClick = () => {
+    const handleClick = useCallback(() => {
+        const now = Date.now();
+        if (now - lastClickTimeRef.current < 300) return; // 300ms cooldown
+        lastClickTimeRef.current = now;
+
         if (isTyping) {
             // Instant Finish
             if (typeIntervalRef.current) clearInterval(typeIntervalRef.current);
@@ -98,21 +103,50 @@ const DialogueBox: React.FC<DialogueBoxProps> = React.memo(({ speaker, speakerTi
                 onComplete();
             }
         }
-    };
+    }, [isTyping, choices, onComplete, text, playSFX]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (state.activeModal !== null) return;
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                handleClick();
+            }
+            if (['1', '2', '3', '4'].includes(e.key) && choices && !isTyping) {
+                const idx = parseInt(e.key, 10) - 1;
+                const choice = choices[idx];
+                if (choice) {
+                    const isLocked = choice.requiredBudget !== undefined && state.budget < choice.requiredBudget;
+                    if (!isLocked) {
+                        e.preventDefault();
+                        playSFX('CLICK');
+                        if (choice.consequences) {
+                            dispatch({ type: 'RESOLVE_CONSEQUENCES', payload: choice.consequences });
+                        }
+                        choice.onClick();
+                    }
+                }
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [handleClick, state.activeModal, choices, isTyping, state.budget, playSFX, dispatch]);
 
     const cycleSpeed = (e: React.MouseEvent) => {
         e.stopPropagation();
         let nextSpeed = 30;
-        if (state.textSpeed === 30) nextSpeed = 0; // Normal -> Instant
+        if (state.textSpeed === 30) nextSpeed = 15; // Normal -> Fast
+        else if (state.textSpeed === 15) nextSpeed = 0; // Fast -> Instant
         else if (state.textSpeed === 0) nextSpeed = 60; // Instant -> Slow
         else nextSpeed = 30; // Slow -> Normal
 
         dispatch({ type: 'SET_TEXT_SPEED', payload: nextSpeed });
     };
 
-    let speedLabel = 'SPEED: 1x';
-    if (state.textSpeed === 0) speedLabel = 'SPEED: MAX';
-    if (state.textSpeed === 60) speedLabel = 'SPEED: 0.5x';
+    let speedLabel = '▶▶'; // Normal
+    if (state.textSpeed === 0) speedLabel = '🚀 MAX'; // Instant
+    if (state.textSpeed === 15) speedLabel = '▶▶▶'; // Fast
+    if (state.textSpeed === 60) speedLabel = '▶'; // Slow
 
     return (
         <motion.div
@@ -125,14 +159,17 @@ const DialogueBox: React.FC<DialogueBoxProps> = React.memo(({ speaker, speakerTi
 
             {/* Name Tag & Speed Control */}
             <div className="flex justify-between items-end transform -translate-y-2 animate-in slide-in-from-bottom-2 duration-300">
-                <div className="bg-obsidian border border-neonCyan px-4 py-1 shadow-neon-cyan clip-path-slant-right">
-                    <span className="font-heading font-bold text-neonCyan uppercase text-sm">
+                <div className="bg-obsidian border border-neonCyan px-4 py-1 shadow-neon-cyan clip-path-slant-right group relative overflow-hidden">
+                    <div className="absolute inset-0 bg-neonCyan/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                    <span className="font-heading font-bold text-neonCyan uppercase text-sm relative z-10 animate-pulse">
                         {speaker} {speakerTitle && <span className="text-white/60 text-xs">| {speakerTitle}</span>}
                     </span>
+                    {/* Subtle Glitch Decal */}
+                    <div className="absolute top-0 right-0 w-2 h-full bg-neonCyan/30 animate-glitch" />
                 </div>
                 <button
                     onClick={cycleSpeed}
-                    className="bg-black/50 border border-gray-600 px-2 py-1 text-[10px] text-gray-400 font-mono hover:text-white hover:border-white transition-colors"
+                    className="bg-black/50 border border-gray-600 px-3 py-1 text-[10px] text-gray-400 font-mono hover:text-white hover:border-white transition-all rounded-sm backdrop-blur-sm"
                 >
                     {speedLabel}
                 </button>
@@ -140,96 +177,97 @@ const DialogueBox: React.FC<DialogueBoxProps> = React.memo(({ speaker, speakerTi
 
             {/* Main Glass Panel */}
             <div
-                className="bg-black/80 backdrop-blur-xl border border-white/20 p-6 md:p-8 rounded-tr-xl rounded-bl-xl shadow-2xl relative cursor-pointer hover:border-white/40 transition-colors"
+                className="bg-black/85 backdrop-blur-2xl border border-white/10 p-7 md:p-9 rounded-tr-2xl rounded-bl-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] relative cursor-pointer hover:border-neonCyan/30 transition-all duration-500 overflow-hidden group flex flex-col"
                 onClick={handleClick}
             >
+                {/* Visual Accent: Side Bar */}
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-neonCyan/40 group-hover:bg-neonCyan transition-colors" />
                 {/* Text Content */}
                 <div className="font-body text-lg leading-relaxed text-white min-h-[4rem]">
                     {renderedContent}
                     {isTyping && <span className="animate-pulse inline-block w-2 h-4 bg-neonCyan ml-1 align-middle" />}
                 </div>
 
+                {/* Choices Overlay (Moved Inside) */}
+                <AnimatePresence>
+                    {!isTyping && choices && choices.length > 0 && (
+                        <motion.div
+                            initial="hidden"
+                            animate="visible"
+                            exit="hidden"
+                            variants={{
+                                visible: { transition: { staggerChildren: 0.08 } }
+                            }}
+                            className="mt-6 w-full flex flex-col gap-3 items-center relative z-10"
+                        >
+                            {choices.map((choice, idx) => {
+                                const isLocked = choice.requiredBudget !== undefined && state.budget < choice.requiredBudget;
+
+                                return (
+                                    <motion.button
+                                        key={idx}
+                                        disabled={isLocked}
+                                        variants={{
+                                            hidden: { opacity: 0, scale: 0.9, y: 15, filter: 'blur(4px)' },
+                                            visible: { opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }
+                                        }}
+                                        whileHover={!isLocked ? {
+                                            scale: 1.05,
+                                            boxShadow: "0px 0px 25px rgba(0, 240, 255, 0.6)",
+                                            borderColor: "rgba(0, 240, 255, 1)",
+                                            backgroundColor: "rgba(0, 240, 255, 0.1)"
+                                        } : {}}
+                                        whileTap={!isLocked ? { scale: 0.98 } : {}}
+                                        onClick={(e) => {
+                                            if (isLocked) return;
+                                            e.stopPropagation();
+                                            playSFX('CLICK');
+                                            if (choice.consequences) {
+                                                dispatch({ type: 'RESOLVE_CONSEQUENCES', payload: choice.consequences });
+                                            }
+                                            choice.onClick();
+                                        }}
+                                        className={`
+                                            font-heading font-bold py-4 px-10 rounded-sm transition-all duration-300
+                                            w-full md:w-auto md:min-w-[420px] text-center relative overflow-hidden
+                                            border-2 group
+                                            ${isLocked
+                                                ? 'bg-gray-900/90 border-gray-800 text-gray-600 cursor-not-allowed grayscale'
+                                                : 'bg-black/95 border-neonCyan/40 text-white shadow-[0_0_15px_rgba(0,240,255,0.1)]'
+                                            }
+                                        `}
+                                    >
+                                        <div className="flex items-center justify-center gap-3 relative z-10">
+                                            {isLocked && <span className="text-sm opacity-50">🔒</span>}
+                                            <span className="tracking-widest uppercase text-sm">{choice.text}</span>
+                                            {choice.requiredBudget !== undefined && (
+                                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono bg-black/50 border ${isLocked ? 'text-red-500 border-red-900' : 'text-neonGreen border-neonGreen/30'}`}>
+                                                    ${choice.requiredBudget}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Interactive Hover Glow Overlay */}
+                                        {!isLocked && (
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                                        )}
+
+                                        {/* Locked Scanline Overlay */}
+                                        {isLocked && <div className="absolute inset-0 bg-black/60 pointer-events-none" />}
+                                    </motion.button>
+                                );
+                            })}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 {/* Continue Indicator */}
                 {!isTyping && (!choices || choices.length === 0) && (
-                    <div className="absolute bottom-4 right-4 animate-bounce text-neonCyan text-xs uppercase tracking-widest font-heading">
+                    <div className="mt-4 text-right animate-bounce text-neonCyan text-xs uppercase tracking-widest font-heading relative z-10 w-full">
                         {state.language === 'EN' ? 'Click to Continue ▼' : 'Nhấn để tiếp tục ▼'}
                     </div>
                 )}
-
-                {/* Did You Know? Popup (Tier 4) */}
-                {!isTyping && Math.random() > 0.7 && !choices?.length && (
-                    <div className="absolute -top-16 left-0 right-0 animate-in slide-in-from-bottom-2 fade-in duration-500 pointer-events-none">
-                        <div className="bg-neonGreen/90 text-black px-4 py-2 rounded-t-lg font-heading font-black text-[10px] uppercase tracking-tighter shadow-neon-green inline-block ml-4">
-                            {state.language === 'EN' ? 'Did You Know?' : 'Bạn có biết?'}
-                        </div>
-                        <div className="bg-black/95 border border-neonGreen p-3 rounded-b-lg rounded-tr-lg shadow-2xl mx-4 text-[11px] text-white font-mono leading-tight">
-                            {getRandomFact(state.language)}
-                        </div>
-                    </div>
-                )}
             </div>
-
-            {/* Choices Overlay */}
-            <AnimatePresence>
-                {!isTyping && choices && choices.length > 0 && (
-                    <motion.div
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
-                        variants={{
-                            visible: { transition: { staggerChildren: 0.08 } }
-                        }}
-                        className="absolute bottom-full mb-4 w-full flex flex-col gap-3 items-center"
-                    >
-                        {choices.map((choice, idx) => {
-                            const isLocked = choice.requiredBudget !== undefined && state.budget < choice.requiredBudget;
-
-                            return (
-                                <motion.button
-                                    key={idx}
-                                    disabled={isLocked}
-                                    variants={{
-                                        hidden: { opacity: 0, scale: 0.9, y: 10 },
-                                        visible: { opacity: 1, scale: 1, y: 0 }
-                                    }}
-                                    whileHover={!isLocked ? { scale: 1.05, boxShadow: "0px 0px 15px rgba(0, 240, 255, 0.5)" } : {}}
-                                    whileTap={!isLocked ? { scale: 0.95 } : {}}
-                                    onClick={(e) => {
-                                        if (isLocked) return;
-                                        e.stopPropagation();
-                                        playSFX('CLICK');
-                                        if (choice.consequences) {
-                                            dispatch({ type: 'RESOLVE_CONSEQUENCES', payload: choice.consequences });
-                                        }
-                                        choice.onClick();
-                                    }}
-                                    className={`
-                                        font-heading font-bold py-3 px-8 rounded transition-all duration-200
-                                        w-full md:w-auto md:min-w-[400px] text-center relative overflow-hidden
-                                        ${isLocked
-                                            ? 'bg-gray-900/80 border-gray-700 text-gray-500 cursor-not-allowed grayscale'
-                                            : 'bg-black/90 border border-neonCyan text-white hover:bg-neonCyan hover:text-black shadow-[0_0_10px_rgba(0,240,255,0.2)]'
-                                        }
-                                    `}
-                                >
-                                    <div className="flex items-center justify-center gap-2">
-                                        {isLocked && <span className="text-xs">🔒</span>}
-                                        <span>{choice.text}</span>
-                                        {choice.requiredBudget !== undefined && (
-                                            <span className={`text-[10px] ml-2 font-mono ${isLocked ? 'text-red-500' : 'text-neonGreen'}`}>
-                                                (${choice.requiredBudget})
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {/* Locked Scanline Overlay */}
-                                    {isLocked && <div className="absolute inset-0 bg-black/40 pointer-events-none" />}
-                                </motion.button>
-                            );
-                        })}
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </motion.div>
     );
 });
@@ -268,13 +306,13 @@ const parseTextWithTooltips = (text: string, lang: 'EN' | 'VI'): ReactNode => {
                     if (split.length >= 2) {
                         newParts.push(split[0]);
                         newParts.push(
-                            <span key={`${def.id}`} className="tooltip-trigger group relative inline-block text-neonCyan font-bold cursor-help border-b border-dashed border-neonCyan/50">
+                            <span key={`${def.id}`} tabIndex={0} className="tooltip-trigger group relative inline-block text-neonCyan font-bold cursor-help border-b border-dashed border-neonCyan/50 focus:outline-none">
                                 {match[0]}
                                 {/* Gen Z style popup */}
                                 <span className="
                                     pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 
-                                    bg-black border-2 border-neonCyan p-3 rounded z-50 opacity-0 
-                                    group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-200
+                                    bg-black border-2 border-neonCyan p-3 rounded z-[300] opacity-0 
+                                    group-hover:opacity-100 group-active:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-200
                                     shadow-[4px_4px_0px_#00F0FF]
                                 ">
                                     <strong className="block text-neonCyan mb-1 text-xs uppercase tracking-widest">{def.title}</strong>
@@ -299,27 +337,6 @@ const parseTextWithTooltips = (text: string, lang: 'EN' | 'VI'): ReactNode => {
     });
 
     return <>{parts}</>;
-};
-
-const getRandomFact = (lang: 'EN' | 'VI') => {
-    const facts = {
-        EN: [
-            "PRIME COST is the baseline. If you sell below this, you're literally paying them to take your stuff.",
-            "ABSORPTION costing is required by accounting standards (IFRS) for external reporting.",
-            "MARGINAL costing is a secret weapon for internal decisions & survival.",
-            "SUNK COSTS are 'ghosts'—don't let them haunt your future decisions.",
-            "CONTRIBUTION is king. No contribution, no boba."
-        ],
-        VI: [
-            "CHI PHÍ CƠ BẢN là ranh giới cuối cùng. Bán dưới mức này là bạn đang làm từ thiện đấy.",
-            "Kế toán HẤP THỤ là bắt buộc theo các chuẩn mực kế toán (IFRS) khi báo cáo ra bên ngoài.",
-            "Kế toán CẬN BIÊN là vũ khí bí mật để ra quyết định nội bộ và sinh tồn.",
-            "CHI PHÍ CHÌM là 'quá khứ'—đừng để nó ảnh hưởng đến quyết định tương lai.",
-            "SỐ DƯ ĐẢM PHÍ là vua. Không có nó thì không có trà sữa đâu."
-        ]
-    };
-    const list = facts[lang];
-    return list[Math.floor(Math.random() * list.length)];
 };
 
 export default DialogueBox;

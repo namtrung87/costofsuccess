@@ -1,9 +1,9 @@
-import React, { Suspense, ReactNode, Component, useState, useEffect, useRef } from 'react';
+import React, { Suspense, ReactNode, useState, useEffect, useRef } from 'react';
 import { GameProvider, useGame } from './context/GameContext';
 import { AudioProvider } from './context/AudioContext';
 import { AchievementPopup } from './components/UI/AchievementPopup';
 import { ACHIEVEMENTS } from './achievements';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, LazyMotion, domAnimation } from 'framer-motion';
 import { GamePhase } from './types';
 import GameHUD from './components/HUD/GameHUD';
 import Handbook from './components/UI/Handbook';
@@ -16,7 +16,9 @@ import WardrobeModal from './components/UI/WardrobeModal';
 import ShareModal from './components/UI/ShareModal';
 import CostDashboard from './components/UI/CostDashboard';
 import BobaShop from './components/Gameplay/BobaShop';
+import DidYouKnow from './components/UI/DidYouKnow';
 import StartScreen from './phases/StartScreen';
+import { useAssetPreloader } from './hooks/useAssetPreloader';
 
 // Lazy Load Phases - Explicit Relative Paths
 const Phase1 = React.lazy(() => import('./phases/Phase1'));
@@ -75,37 +77,37 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children }) => {
-  const [hasError, setHasError] = React.useState(false);
-  const [error, setError] = React.useState<Error | null>(null);
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  state: ErrorBoundaryState = { hasError: false, error: null };
 
-  React.useEffect(() => {
-    const handleError = (event: ErrorEvent) => {
-      setHasError(true);
-      setError(event.error);
-    };
-    window.addEventListener('error', handleError);
-    return () => window.removeEventListener('error', handleError);
-  }, []);
-
-  if (hasError) {
-    return (
-      <div className="h-screen w-full flex flex-col items-center justify-center bg-black text-red-500 font-mono p-8 text-center">
-        <h1 className="text-4xl mb-4">SYSTEM FAILURE</h1>
-        <p className="border border-red-500 p-4 rounded mb-4 max-w-2xl bg-red-900/10 break-all">
-          {error?.message || "Unknown Error"}
-        </p>
-        <button
-          className="px-6 py-2 bg-red-600 text-black font-bold rounded hover:bg-red-500 transition-colors"
-          onClick={() => window.location.reload()}
-        >
-          REBOOT SYSTEM
-        </button>
-      </div>
-    );
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
   }
-  return <>{children}</>;
-};
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="h-screen w-full flex flex-col items-center justify-center bg-black text-red-500 font-mono p-8 text-center">
+          <h1 className="text-4xl mb-4">SYSTEM FAILURE</h1>
+          <p className="border border-red-500 p-4 rounded mb-4 max-w-2xl bg-red-900/10 break-all">
+            {this.state.error?.message || "Unknown Error"}
+          </p>
+          <button
+            className="px-6 py-2 bg-red-600 text-black font-bold rounded hover:bg-red-500 transition-colors"
+            onClick={() => window.location.reload()}
+          >
+            REBOOT SYSTEM
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const GameContent: React.FC = () => {
   const { state, dispatch } = useGame();
@@ -247,6 +249,7 @@ const GameContent: React.FC = () => {
       <ShareModal />
       <CostDashboard />
       <BobaShop />
+      <DidYouKnow />
 
       {/* HUD (Heads Up Display) */}
       <GameHUD />
@@ -277,11 +280,18 @@ const GameContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  const { isLoaded, progress } = useAssetPreloader();
+
+  // No longer blocking the entire app unless they are NOT on the StartScreen, allowing fast TTI
+  // StartScreen can handle its own internal loading or show instantly.
   return (
     <ErrorBoundary>
       <GameProvider>
         <AudioProvider>
-          <GameContent />
+          <LazyMotion features={domAnimation} strict>
+            <GameContent />
+          </LazyMotion>
+          {/* Optional: we can display a tiny non-intrusive preloader somewhere in HUD if !isLoaded, but StartScreen takes care of itself */}
         </AudioProvider>
       </GameProvider>
     </ErrorBoundary>

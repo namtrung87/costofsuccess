@@ -7,19 +7,17 @@ import { X, TrendingUp, TrendingDown, PieChart, Activity, DollarSign, Brain } fr
 const CostDashboard: React.FC = () => {
     const { state, dispatch } = useGame();
 
-    if (!state.isDashboardOpen) return null;
+    if (state.activeModal !== 'DASHBOARD') return null;
 
-    // Mock data calculations based on game state
-    // In a real scenario, we'd track Prime vs Period costs in the state
-    const primeCostPercent = 65;
-    const periodCostPercent = 35;
-    const breakEvenPoint = 1200;
-    const currentEfficiency = 88;
+    const primeCostPercent = Math.min(90, Math.max(10, Math.floor((state.budget % 100) + 40)));
+    const periodCostPercent = 100 - primeCostPercent;
+    const currentEfficiency = Math.min(100, Math.floor(state.sanity * 0.8 + (state.streak * 5)));
 
-    const dataPoints = [40, 60, 45, 70, 55, 80, 75];
+    const historyPoints = state.sanityHistory.length > 2 ? state.sanityHistory : [50, 60, 75];
+    const dataPoints = [...historyPoints.slice(-10), state.sanity];
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 md:p-8">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 md:p-8">
             <AnimatePresence>
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9, y: 20 }}
