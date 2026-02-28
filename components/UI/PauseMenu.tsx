@@ -192,21 +192,32 @@ const PauseMenu: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Phase Select */}
+                {/* Level Selection */}
                 <div>
-                    <h3 className="text-neonCyan font-mono text-xs uppercase mb-2">{ui.LEVEL_SELECT}</h3>
-                    <div className="flex flex-col gap-2 max-h-36 overflow-y-auto pr-1">
-                        {state.unlockedPhases.map((phase) => (
-                            <button
-                                key={phase}
-                                onClick={() => handlePhaseSelect(phase)}
-                                disabled={state.currentPhase === phase}
-                                aria-current={state.currentPhase === phase ? 'page' : undefined}
-                                className={`px-4 py-2 text-left border rounded transition-all font-mono text-sm ${state.currentPhase === phase ? 'bg-neonGreen/20 border-neonGreen text-white cursor-default' : 'bg-black/40 border-gray-700 text-gray-400 hover:bg-white/10 hover:border-white hover:text-white'}`}
-                            >
-                                {getPhaseLabel(phase)}
-                            </button>
-                        ))}
+                    <h3 className="text-neonCyan font-mono text-xs uppercase mb-3 border-b border-neonCyan/30 pb-1 flex justify-between">
+                        <span>{ui.LEVEL_SELECT}</span>
+                        <span className="text-[10px] opacity-50">35 PHASES TOTAL</span>
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2 overflow-y-auto max-h-[160px] pr-2 custom-scrollbar">
+                        {Object.values(GamePhase)
+                            .filter(p => p.startsWith('PHASE_'))
+                            .map((phase) => (
+                                <button
+                                    key={phase}
+                                    onClick={() => handlePhaseSelect(phase)}
+                                    disabled={state.currentPhase === phase}
+                                    className={`
+                                        px-3 py-2 text-left border rounded transition-all font-mono text-[10px] leading-tight flex flex-col gap-1
+                                        ${state.currentPhase === phase
+                                            ? 'bg-neonGreen/20 border-neonGreen text-white cursor-default'
+                                            : 'bg-black/40 border-gray-700 text-gray-400 hover:bg-neonCyan/10 hover:border-neonCyan hover:text-white'
+                                        }
+                                    `}
+                                >
+                                    <span className="opacity-50 text-[8px]">{phase.replace(/_/g, ' ')}</span>
+                                    <span className="truncate">{getPhaseLabel(phase)}</span>
+                                </button>
+                            ))}
                     </div>
                 </div>
 
