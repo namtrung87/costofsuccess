@@ -36,13 +36,23 @@ export const useAssetPreloader = () => {
 
         assetUrls.forEach(url => {
             const img = new Image();
-            img.onload = handleLoad;
-            img.onerror = () => handleError(url);
+            let loadCalled = false;
+            const wrappedHandleLoad = () => {
+                if (!loadCalled) {
+                    loadCalled = true;
+                    handleLoad();
+                }
+            };
+
+            img.onload = wrappedHandleLoad;
+            img.onerror = () => {
+                console.error(`Failed to load asset: ${url}`);
+                wrappedHandleLoad();
+            };
             img.src = url;
 
-            // Handle cached images
             if (img.complete) {
-                // handleLoad(); // This can cause double counting if not careful
+                wrappedHandleLoad();
             }
         });
 

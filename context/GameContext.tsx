@@ -163,6 +163,10 @@ export const gameReducer = (state: GameState, action: ActionType): GameState => 
         }
       });
       return newState;
+    case 'RESET_GAME':
+      localStorage.removeItem('GAME_PROGRESS_V1');
+      localStorage.removeItem('GAME_SAVE_SLOTS_V1');
+      return { ...INITIAL_STATE, language: state.language };
     default:
       return state;
   }
@@ -196,8 +200,9 @@ const init = (initialState: GameState): GameState => {
       const progress = JSON.parse(savedProgress);
       loadedState = {
         ...loadedState,
-        currentPhase: progress.currentPhase,
-        unlockedPhases: progress.unlockedPhases,
+        // ALWAYS START AT START_SCREEN on fresh boot
+        currentPhase: GamePhase.START_SCREEN,
+        unlockedPhases: progress.unlockedPhases || [GamePhase.START_SCREEN],
         budget: progress.budget,
         sanity: progress.sanity,
         budgetHistory: progress.budgetHistory || [],

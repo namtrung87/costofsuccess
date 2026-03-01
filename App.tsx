@@ -303,16 +303,17 @@ const GameContent: React.FC = () => {
 const App: React.FC = () => {
   const { isLoaded, progress } = useAssetPreloader();
 
-  // No longer blocking the entire app unless they are NOT on the StartScreen, allowing fast TTI
-  // StartScreen can handle its own internal loading or show instantly.
   return (
     <ErrorBoundary>
       <GameProvider>
         <AudioProvider>
           <LazyMotion features={domAnimation} strict>
-            <GameContent />
+            {!isLoaded ? (
+              <LoadingScreen progress={progress} />
+            ) : (
+              <GameContent />
+            )}
           </LazyMotion>
-          {/* Optional: we can display a tiny non-intrusive preloader somewhere in HUD if !isLoaded, but StartScreen takes care of itself */}
         </AudioProvider>
       </GameProvider>
     </ErrorBoundary>

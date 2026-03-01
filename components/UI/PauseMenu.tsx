@@ -45,6 +45,13 @@ const PauseMenu: React.FC = () => {
     const handlePractice = () => dispatch({ type: 'ENTER_PRACTICE' });
     const handleFeedback = () => dispatch({ type: 'TOGGLE_FEEDBACK' });
 
+    const handleFullReset = () => {
+        if (window.confirm(state.language === 'EN' ? 'ARE YOU SURE? THIS WIPES ALL PROGRESS FOREVER.' : 'BẠN CÓ CHẮC KHÔNG? TOÀN BỘ TIẾN TRÌNH SẼ BỊ XÓA VĨNH VIỄN.')) {
+            dispatch({ type: 'RESET_GAME' });
+            window.location.reload();
+        }
+    };
+
     const handlePhaseSelect = (phase: GamePhase) => {
         dispatch({ type: 'SET_PHASE', payload: phase });
         dispatch({ type: 'TOGGLE_MENU' });
@@ -153,7 +160,10 @@ const PauseMenu: React.FC = () => {
                     <CyberButton label={ui.PRACTICE_MODE} variant="SECONDARY" onClick={handlePractice} />
                     <CyberButton label={state.language === 'EN' ? 'SHARE PERFORMANCE' : 'CHIA SẺ THÀNH TÍCH'} variant="SECONDARY" onClick={() => dispatch({ type: 'TOGGLE_SHARE_MODAL' })} />
                     <CyberButton label={ui.FEEDBACK} variant="SECONDARY" onClick={handleFeedback} />
-                    <CyberButton label={ui.RESTART} variant="DANGER" onClick={handleRestart} />
+                    <div className="grid grid-cols-2 gap-3">
+                        <CyberButton label={ui.RESTART} variant="DANGER" onClick={handleRestart} />
+                        <CyberButton label={state.language === 'EN' ? 'FULL RESET' : 'XÓA HẾT'} variant="DANGER" onClick={handleFullReset} />
+                    </div>
                 </div>
 
                 {/* Save Slots */}
