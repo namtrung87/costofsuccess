@@ -175,8 +175,8 @@ export const gameReducer = (state: GameState, action: ActionType): GameState => 
 // Initializer to load assets from LocalStorage
 const init = (initialState: GameState): GameState => {
   try {
-    // UPDATED STORAGE KEY TO FORCE ASSET REFRESH (V10)
-    const savedAssets = localStorage.getItem('GAME_ASSETS_V10');
+    // UPDATED STORAGE KEY TO FORCE ASSET REFRESH (V11)
+    const savedAssets = localStorage.getItem('GAME_ASSETS_V11');
 
     // Check for saved avatar settings
     const savedAvatar = localStorage.getItem('GAME_AVATAR');
@@ -188,7 +188,15 @@ const init = (initialState: GameState): GameState => {
     const savedProgress = localStorage.getItem('GAME_PROGRESS_V1');
 
     if (savedAssets) {
-      loadedState.assets = JSON.parse(savedAssets);
+      const parsedAssets = JSON.parse(savedAssets);
+      // SANITIZATION: Check for broken local file paths from previous versions
+      const hasBrokenPaths = Object.values(parsedAssets).some(url => typeof url === 'string' && url.includes('file:///'));
+
+      if (hasBrokenPaths) {
+        console.warn("Detected broken asset paths in storage, resetting to defaults.");
+      } else {
+        loadedState.assets = parsedAssets;
+      }
     }
     if (savedAvatar) {
       loadedState.playerAvatar = savedAvatar;
@@ -231,7 +239,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Persistence Logic: Save assets whenever they change
   useEffect(() => {
     try {
-      localStorage.setItem('GAME_ASSETS_V10', JSON.stringify(state.assets));
+      localStorage.setItem('GAME_ASSETS_V11', JSON.stringify(state.assets));
     } catch (e) {
       console.warn("Failed to save assets to storage (Quota exceeded?)", e);
     }
