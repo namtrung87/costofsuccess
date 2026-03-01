@@ -177,4 +177,5 @@ export type ActionType =
   | { type: 'SET_DIFFICULTY'; payload: Difficulty }
   | { type: 'CLOSE_MODAL' }
   | { type: 'SET_MARKET_EVENT'; payload: { name: string; description: string; type: 'neutral' | 'positive' | 'negative'; costMult: number; rewardMult: number; sanityMult: number } | null }
-  | { type: 'RESOLVE_CONSEQUENCES'; payload: Consequence[] };
+  | { type: 'RESOLVE_CONSEQUENCES'; payload: Consequence[] }
+  | { type: 'RESET_GAME' };
